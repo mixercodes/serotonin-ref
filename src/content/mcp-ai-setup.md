@@ -37,7 +37,7 @@ Key rules:
 - cheat.register("onPaint", fn) is required context for ALL draw.* calls
 - draw.* alpha is 0..255 integers (NOT 0..1 floats) — passing 1 renders near-invisible
 - entity.GetPlayers(false) excludes the local player — use entity.GetLocalPlayer()
-- p.IsVisible is always false — do not use as a wall check
+- p.IsVisible requires at least one Visible Only check active in Serotonin (ESP, Aimbot, or Triggerbot) — returns false when none are enabled
 - GetBonePosition can return nil — guard with: if not b then ... end
 - Entity bone cache only covers enemies; use workspace for teammate positions
 - ui GetValue/SetValue for dropdown/listbox uses 0-based index (0 = first option)

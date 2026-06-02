@@ -26,13 +26,13 @@ Every value returned by `GetPlayers`, `GetLocalPlayer`, and `GetTarget` is a pla
 | `MaxHealth` | `number` | max HP |
 | `IsAlive` | `bool` | whether the player is alive and spawned |
 | `IsEnemy` | `bool` | `true` if on the opposing team |
-| `IsVisible` | `bool` | **always `false` — do not use for wall checks** (see note below) |
+| `IsVisible` | `bool` | `true` when not occluded. **Requires at least one Visible Only check active** in Serotonin (ESP, Aimbot, or Triggerbot) — returns `false` when none are enabled |
 | `IsWhitelisted` | `bool` | `true` if added via `game.PlayerWhitelist` |
 | `BoundingBox` | `table {x, y, w, h}` | screen-space pixel rectangle; all zeros when off-screen |
 
 > **`Position` is stale.** In FFA and many competitive modes, `p.Position` stays at `(0,0,0)` for all living players. Use `p:GetBonePosition("HumanoidRootPart")` for live world position.
 
-> **`IsVisible` is non-functional.** It returns `false` for every player regardless of line-of-sight. Confirmed across 12 alive players in tested games. Do not use it as a wall check — it silently excludes all targets. No raycast API is available in Serotonin.
+> **`IsVisible` requires a Visible Only check to be active.** With no Visible Only checks enabled in Serotonin (ESP, Aimbot, or Triggerbot), the field returns `false` for all players — wall checking is skipped as a performance optimization. Enable at least one for valid results.
 
 ## Bone accessors
 

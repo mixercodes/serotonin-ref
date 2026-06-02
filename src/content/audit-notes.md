@@ -21,7 +21,7 @@ Every page is the result of live probing against a running Serotonin build. If a
 
 - **Draw alpha is 0–255 integers, not 0..1 floats.** Every `draw.*` primitive treats the alpha argument as a byte. Passing `1.0` renders at 1/255 opacity — effectively invisible.
 - **`entity.GetPlayers(false)` excludes the local player.** Use `entity.GetLocalPlayer()` for yourself.
-- **`p.IsVisible` is always `false`.** Confirmed across 12 live players. Non-functional as a wall check.
+- **`p.IsVisible` requires a Visible Only check active in Serotonin.** With none enabled (ESP, Aimbot, or Triggerbot), returns `false` for all players — wall checking is skipped as a performance optimization. Enable at least one for valid results.
 - **`GetBonePosition` can return nil.** Not just zero-vector. Always guard with `if not b then`.
 - **Entity bone cache only covers enemies.** Teammates return zero from `GetBonePosition`. Fall back to workspace for teammate positions.
 - **Dropdown and listbox `GetValue` returns 0-based index** (`0` = first option).

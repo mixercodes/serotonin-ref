@@ -2,7 +2,7 @@ import Link from "next/link";
 import { pagesBySection } from "@/lib/pages";
 
 export default function Home() {
-  const { library, foundation } = pagesBySection();
+  const { library, foundation, tool } = pagesBySection();
 
   return (
     <main className="flex-1 overflow-y-auto min-h-0">
@@ -44,7 +44,7 @@ export default function Home() {
           <p className="text-sm mb-8 text-[--text-muted]">
             Also available as an{" "}
             <span className="font-medium text-[--accent-light]">MCP server</span> —
-            drop the URL into your Claude config and let AI assistants query it directly.
+            add the URL to your MCP config and let AI assistants query it directly.
           </p>
 
           <div className="flex flex-wrap gap-3">
@@ -70,17 +70,17 @@ export default function Home() {
       {/* MCP config card */}
       <section className="px-10 py-8 border-b border-bg-border">
         <h2 className="text-xs font-semibold uppercase tracking-widest mb-4 text-[--text-muted]">
-          MCP Server — drop-in replacement
+          MCP Server
         </h2>
         <div className="bg-bg-surface border border-bg-border rounded-xl p-5 max-w-2xl">
           <p className="text-sm mb-4 text-[--text-muted]">
             Add a single URL to your{" "}
-            <code className="text-xs bg-bg-elevated px-1 py-0.5 rounded text-[--accent-light]">claude_desktop_config.json</code>{" "}
+            <code className="text-xs bg-bg-elevated px-1 py-0.5 rounded text-[--accent-light]">.mcp.json</code>{" "}
             and every tool is available with no local install.
           </p>
           <div>
             <div className="text-[10px] uppercase tracking-widest mb-1.5 text-[--text-muted]">
-              Claude Desktop config
+              .mcp.json
             </div>
             <pre className="bg-bg-base border border-bg-border rounded-lg p-4 text-xs font-mono overflow-x-auto text-[--text]">
               <code>{`{
@@ -118,6 +118,17 @@ export default function Home() {
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
                   >
                     <span className="text-[10px] text-[--accent]">◆</span>
+                    <span className="font-mono">{p.title}</span>
+                  </Link>
+                </li>
+              ))}
+              {tool.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/docs/${p.slug}`}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
+                  >
+                    <span className="text-[9px] font-mono shrink-0 text-[--text-muted]">⚙</span>
                     <span className="font-mono">{p.title}</span>
                   </Link>
                 </li>

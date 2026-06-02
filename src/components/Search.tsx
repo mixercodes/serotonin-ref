@@ -61,6 +61,22 @@ function runSearch(query: string, index: SearchEntry[]): Result[] {
     .slice(0, 10);
 }
 
+function highlight(text: string, query: string): React.ReactNode {
+  const q = query.trim();
+  if (!q) return text;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark style={{ background: "var(--accent)", color: "var(--bg-base)", borderRadius: "2px", padding: "0 2px", fontStyle: "normal" }}>
+        {text.slice(idx, idx + q.length)}
+      </mark>
+      {text.slice(idx + q.length)}
+    </>
+  );
+}
+
 export default function Search({ index }: { index: SearchEntry[] }) {
   const [open, setOpen]       = useState(false);
   const [query, setQuery]     = useState("");
@@ -170,12 +186,12 @@ export default function Search({ index }: { index: SearchEntry[] }) {
                       {SECTION_BADGE[r.section]}
                     </span>
                     <span className="text-sm font-medium" style={{ color: "var(--text-heading)" }}>
-                      {r.title}
+                      {highlight(r.title, query)}
                     </span>
                   </div>
                   {r.snippet && (
                     <p className="text-xs leading-relaxed line-clamp-2 pl-10" style={{ color: "var(--text-muted)" }}>
-                      {r.snippet}
+                      {highlight(r.snippet, query)}
                     </p>
                   )}
                 </button>

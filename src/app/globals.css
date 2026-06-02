@@ -182,6 +182,7 @@ body {
   background: var(--code-bg) !important;
   border: 1px solid var(--bg-border);
   border-radius: 8px;
+  overflow-x: auto;
 }
 
 .prose code:not(pre code) {
@@ -216,6 +217,12 @@ body {
   border-radius: 0 4px 4px 0;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+  overflow-x: auto;
+}
+
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: "";
 }
 
 .prose h2, .prose h3, .prose h4 { scroll-margin-top: 80px; }
