@@ -1,0 +1,123 @@
+# `game`
+
+Entry point to the Roblox DataModel and a small set of cheat-side utilities. The `game` object is a **Lua table proxy** — not a Roblox Instance — so all methods use dot syntax, not colon.
+
+> **Always use dot syntax.** `game.GetService("Players")` works. `game:GetService("Players")` fails with a Lua error because there is no self argument to pass.
+
+## Pre-resolved fields
+
+| Field | Type | Notes |
+|---|---|---|
+| `game.Workspace` | Roblox `Workspace` | always available |
+| `game.Players` | Roblox `Players` service | always available |
+| `game.LocalPlayer` | Roblox `Player` | local user — use this, not `GetService("Players").LocalPlayer` which is `nil` in the sandbox |
+| `game.CameraPosition` | `Vector3` | live camera world position |
+| `game.Lighting` | `nil` | not pre-resolved — use `game.GetService("Lighting")` |
+
+Other services (`RunService`, `ReplicatedStorage`, etc.) are not pre-resolved. Use `GetService` to fetch them.
+
+---
+
+## `GetService`
+
+```lua
+game.GetService(name: string) → userdata | nil
+```
+
+Returns the Roblox service whose ClassName is `name`. Returns `nil` for unknown names or non-string arguments. Passing `nil` raises.
+
+Services confirmed to return userdata: `Players`, `Lighting`, `Workspace`, `HttpService`, `RunService`, `TeleportService`, `UserInputService`, `ReplicatedStorage`, `StarterGui`, `MarketplaceService`.
+
+`ServerStorage` returns `nil` (server-side only).
+
+```lua
+local rs  = game.GetService("ReplicatedStorage")
+local run = game.GetService("RunService")
+```
+
+---
+
+## `GetFFlag` / `SetFFlag`
+
+```lua
+game.GetFFlag(name: string, type: string) → value | nil
+game.SetFFlag(name: string, value, type: string)
+```
+
+Read or write a Roblox FFlag. Valid `type` strings: `'int'`, `'bool'`, `'float'`, `'double'`. Returns `nil` for unknown flag names (no error). Any other type string raises.
+
+`SetFFlag` changes live Roblox client behavior. Avoid unless you know what the flag does — restart Roblox to reset.
+
+```lua
+local cap = game.GetFFlag("TaskSchedulerTargetFps", "int")
+if cap then
+    print("FPS cap:", cap)
+end
+```
+
+---
+
+## `SilentAim`
+
+```lua
+game.SilentAim(x: number, y: number)
+```
+
+Directs the cheat aim system at screen-space `(x, y)`. Can trigger a shot depending on aim configuration — always gate with a target validity check.
+
+```lua
+local tgt = entity.GetTarget()
+if tgt and tgt.IsAlive and tgt.IsEnemy then
+    local pos = tgt:GetBonePosition("Head")
+    if pos then
+        local x, y, on = utility.WorldToScreen(pos)
+        if on then game.SilentAim(x, y) end
+    end
+end
+```
+
+---
+
+## `PlayerWhitelist`
+
+```lua
+game.PlayerWhitelist(name: string)
+```
+
+Marks a username as friendly. The player's `IsWhitelisted` field becomes `true` and aim systems skip them. No removal API — whitelisted entries persist for the script lifetime.
+
+```lua
+game.PlayerWhitelist("FriendUsername")
+```
+
+---
+
+## Patterns
+
+### Walk a service's children
+
+```lua
+local rs = game.GetService("ReplicatedStorage")
+for _, child in ipairs(rs:GetChildren()) do
+    print(child.Name, child.ClassName)
+end
+```
+
+### Whitelist a list at load
+
+```lua
+for _, name in ipairs({"Alice", "Bob"}) do
+    game.PlayerWhitelist(name)
+end
+```
+
+### Live camera position
+
+```lua
+cheat.register("onUpdate", function()
+    local cam = game.CameraPosition
+    if cam then
+        print(string.format("cam (%.0f, %.0f, %.0f)", cam.X, cam.Y, cam.Z))
+    end
+end)
+```
