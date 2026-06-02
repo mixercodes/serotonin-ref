@@ -134,9 +134,8 @@ export function listFunctions(args: { library?: string; locale?: string }) {
   for (let i = 0; i < lines.length; i++) {
     if (!lines[i].startsWith("## ")) continue;
     const backtick = lines[i].match(/##\s+`([^`]+)`/);
-    const plain    = lines[i].match(/##\s+(.+)/);
-    const name = backtick ? backtick[1] : plain ? plain[1].trim() : null;
-    if (!name) continue;
+    if (!backtick) continue; // skip prose section headers — only index backtick-named entries
+    const name = backtick[1];
 
     // First prose line after the heading (skip code blocks, blank lines, tables, rules)
     let description = "";
