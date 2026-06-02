@@ -228,6 +228,17 @@ body {
 .prose h2, .prose h3, .prose h4 { scroll-margin-top: 80px; }
 
 /* ─────────────────────────────────────────────────────────────────
+   Search term highlight — applied on arrival from search
+   ───────────────────────────────────────────────────────────────── */
+mark.search-term-highlight {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+  font-style: inherit;
+}
+
+/* ─────────────────────────────────────────────────────────────────
    Sidebar active state
    ───────────────────────────────────────────────────────────────── */
 .sidebar-item-active {

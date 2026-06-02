@@ -7,6 +7,14 @@ function clampLocale(input?: string): Locale {
   return input === "ru" ? "ru" : "en";
 }
 
+function resolveSlug(library: string): string | undefined {
+  if (PAGES.find((p) => p.slug === library)) return library;
+  for (const prefix of ["libraries", "userdata", "tools"]) {
+    const candidate = `${prefix}/${library}`;
+    if (PAGES.find((p) => p.slug === candidate)) return candidate;
+  }
+}
+
 export function listPages(args: { locale?: string } = {}) {
   void clampLocale(args.locale);
   return PAGES.map((p) => ({ slug: p.slug, title: p.title, section: p.section }));
@@ -82,11 +90,9 @@ export function getFunction(args: {
     throw new Error("get_function: 'name' is required");
   }
   const locale = clampLocale(args.locale);
-  const slug = args.library.includes("/") ? args.library : `libraries/${args.library}`;
-  const known = PAGES.find((p) => p.slug === slug);
-  if (!known) {
-    throw new Error(`get_function: unknown library '${args.library}'`);
-  }
+  const slug = resolveSlug(args.library);
+  if (!slug) throw new Error(`get_function: unknown library '${args.library}'`);
+
   const body = fetchPage(slug, locale);
   const lines = body.split("\n");
   const target = args.name.toLowerCase();
@@ -104,11 +110,61 @@ export function getFunction(args: {
   if (i === lines.length) {
     throw new Error(
       `get_function: function '${args.name}' not found on page ${slug}. ` +
-        `Use list_pages + read_page to inspect.`
+        `Use list_functions to see what's available.`
     );
   }
   const start = i;
   let end = i + 1;
   while (end < lines.length && !lines[end].startsWith("## ")) end++;
   return lines.slice(start, end).join("\n").trim();
+}
+
+export function listFunctions(args: { library?: string; locale?: string }) {
+  if (typeof args.library !== "string" || !args.library) {
+    throw new Error("list_functions: 'library' is required (e.g. 'draw', 'entity', 'Vector3')");
+  }
+  const locale = clampLocale(args.locale);
+  const slug = resolveSlug(args.library);
+  if (!slug) throw new Error(`list_functions: unknown library '${args.library}'`);
+
+  const body = fetchPage(slug, locale);
+  const lines = body.split("\n");
+  const functions: Array<{ name: string; description: string }> = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i].startsWith("## ")) continue;
+    const backtick = lines[i].match(/##\s+`([^`]+)`/);
+    if (!backtick) continue; // skip prose section headers — only index backtick-named entries
+    const name = backtick[1];
+
+    // First prose line after the heading (skip code blocks, blank lines, tables, rules)
+    let description = "";
+    let inCode = false;
+    for (let j = i + 1; j < lines.length && !lines[j].startsWith("## "); j++) {
+      const ln = lines[j].trim();
+      if (ln.startsWith("```")) { inCode = !inCode; continue; }
+      if (inCode || !ln || ln.startsWith("|") || ln === "---") continue;
+      description = ln;
+      break;
+    }
+
+    functions.push({ name, description });
+  }
+
+  return { library: slug, count: functions.length, functions };
+}
+
+export function lookup(args: { fn?: string; locale?: string }) {
+  if (typeof args.fn !== "string" || !args.fn) {
+    throw new Error("lookup: 'fn' is required (e.g. 'utility.GetTickCount')");
+  }
+  const dot = args.fn.indexOf(".");
+  if (dot === -1) {
+    throw new Error("lookup: 'fn' must be in 'library.FunctionName' format");
+  }
+  return getFunction({
+    library: args.fn.slice(0, dot),
+    name:    args.fn.slice(dot + 1),
+    locale:  args.locale,
+  });
 }
