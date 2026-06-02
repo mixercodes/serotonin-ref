@@ -236,7 +236,7 @@ body {
   100% { background-color: transparent; }
 }
 
-.prose :target { animation: anchor-flash 1.2s ease-out; }
+.anchor-highlight { animation: anchor-flash 1.2s ease-out; }
 
 /* ─────────────────────────────────────────────────────────────────
    Sidebar active state
