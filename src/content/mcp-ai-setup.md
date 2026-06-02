@@ -35,7 +35,7 @@ Key rules:
 - LuaJIT 2.0.3 sandbox, Lua 5.1 semantics
 - Not in sandbox: _G (doesn't exist — use bare globals), jit, ffi, os, io, debug, buffer, raknet, string.buffer
 - cheat.register("onPaint", fn) is required context for ALL draw.* calls
-- draw.* alpha is 0..255 integers (NOT 0..1 floats) — passing 1 renders near-invisible
+- draw.* alpha is 0..255 integers — passing 1 renders near-invisible
 - entity.GetPlayers(false) excludes the local player — use entity.GetLocalPlayer()
 - p.IsVisible requires at least one Visible Only check active in Serotonin (ESP, Aimbot, or Triggerbot) — returns false when none are enabled
 - GetBonePosition can return nil — guard with: if not b then ... end

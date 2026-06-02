@@ -29,5 +29,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local dev notes (tracked on dev branch only — not merged to master/Vercel)
-# CLAUDE.md
+# Local dev notes
+CLAUDE.md
