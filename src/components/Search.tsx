@@ -122,15 +122,16 @@ export default function Search({ index }: { index: SearchEntry[] }) {
     setResults(runSearch(q, index));
   }, [index]);
 
-  const navigate = useCallback((slug: string) => {
+  const navigate = useCallback((result: Result) => {
     setOpen(false);
-    router.push(`/docs/${slug}`);
+    const hash = result.anchor ? `#${result.anchor}` : "";
+    router.push(`/docs/${result.slug}${hash}`);
   }, [router]);
 
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") { e.preventDefault(); setCursor((c) => Math.min(c + 1, results.length - 1)); }
     if (e.key === "ArrowUp")   { e.preventDefault(); setCursor((c) => Math.max(c - 1, 0)); }
-    if (e.key === "Enter" && results[cursor]) navigate(results[cursor].slug);
+    if (e.key === "Enter" && results[cursor]) navigate(results[cursor]);
   };
 
   if (!open) return null;
@@ -171,9 +172,9 @@ export default function Search({ index }: { index: SearchEntry[] }) {
         {results.length > 0 && (
           <ul ref={listRef} className="max-h-96 overflow-y-auto py-2">
             {results.map((r, i) => (
-              <li key={r.slug}>
+              <li key={`${r.slug}#${r.anchor ?? ""}`}>
                 <button
-                  onClick={() => navigate(r.slug)}
+                  onClick={() => navigate(r)}
                   onMouseEnter={() => setCursor(i)}
                   className="w-full text-left px-4 py-3 flex flex-col gap-1 transition-colors"
                   style={{ background: i === cursor ? "var(--bg-elevated)" : "transparent" }}
