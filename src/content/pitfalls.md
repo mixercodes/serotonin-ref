@@ -10,7 +10,7 @@ Calls that trigger native SEH exceptions inside the Serotonin DLL. `pcall` does 
 | `cheat.LoadString(code, name)` | Every 2-arg invocation raises an uncatchable `"C++ exception"`. Use standard `loadstring()` instead |
 | Concurrent cheat calls | The sandbox is not thread-safe |
 
-## Things that do not crash
+## Sandbox notes
 
 | Call | Behaviour |
 |---|---|
@@ -20,8 +20,7 @@ Calls that trigger native SEH exceptions inside the Serotonin DLL. `pcall` does 
 | `game.PlaceID` | Returns the place ID |
 | `Color3:ToHSV()` | Returns `h, s, v` multi-return cleanly |
 | `game.GetFFlag` / `game.SetFFlag` | Safe — type must be `"int"`, `"bool"`, `"float"`, or `"double"` |
-| `Workspace:GetDescendants()` on large trees | Does not crash |
-| `Vector3.Magnitude` / `.Unit`, Vector3 arithmetic | All work |
+| `Workspace:GetDescendants()` on large trees | Does not crash — performance cost scales with tree size |
 
 ## Performance considerations
 

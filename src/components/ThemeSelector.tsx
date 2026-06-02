@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 type Theme = "default" | "gruvbox" | "nord" | "catppuccin";
 
 const THEMES: { id: Theme; label: string; dot: string }[] = [
-  { id: "default",    label: "Default",    dot: "#c0c0c0" },
   { id: "gruvbox",    label: "Gruvbox",    dot: "#fe8019" },
+  { id: "default",    label: "Default",    dot: "#c0c0c0" },
   { id: "nord",       label: "Nord",       dot: "#88c0d0" },
   { id: "catppuccin", label: "Catppuccin", dot: "#cba6f7" },
 ];
 
 export default function ThemeSelector() {
-  const [current, setCurrent] = useState<Theme>("default");
+  const [current, setCurrent] = useState<Theme>("gruvbox");
 
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme | null;
