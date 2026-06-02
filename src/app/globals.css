@@ -228,16 +228,8 @@ body {
 .prose h2, .prose h3, .prose h4 { scroll-margin-top: 80px; }
 
 /* ─────────────────────────────────────────────────────────────────
-   Search anchor highlight — fires on hash navigation
+   Search term highlight — applied on arrival from search
    ───────────────────────────────────────────────────────────────── */
-@keyframes anchor-flash {
-  0%,
-  60% { background-color: color-mix(in srgb, var(--accent) 22%, transparent); border-radius: 4px; }
-  100% { background-color: transparent; }
-}
-
-.anchor-highlight { animation: anchor-flash 1.2s ease-out; }
-
 mark.search-term-highlight {
   background: color-mix(in srgb, var(--accent) 35%, transparent);
   color: inherit;

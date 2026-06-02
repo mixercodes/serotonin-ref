@@ -70,15 +70,13 @@ export default function MarkdownContent({ content }: Props) {
     // rAF inside ensures the browser has painted the new content.
     const timer = setTimeout(() => {
       requestAnimationFrame(() => {
-        if (hash) {
-          const el = document.getElementById(hash);
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
-            el.classList.add("anchor-highlight");
-            el.addEventListener("animationend", () => el.classList.remove("anchor-highlight"), { once: true });
-          }
-        }
         cleanup = applySearchHighlights(query);
+        const firstMark = document.querySelector("mark.search-term-highlight");
+        if (firstMark) {
+          firstMark.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else if (hash) {
+          document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       });
     }, 50);
 
