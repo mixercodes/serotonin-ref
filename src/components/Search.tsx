@@ -124,9 +124,10 @@ export default function Search({ index }: { index: SearchEntry[] }) {
 
   const navigate = useCallback((result: Result) => {
     setOpen(false);
+    if (query) sessionStorage.setItem("search-query", query);
     const hash = result.anchor ? `#${result.anchor}` : "";
     router.push(`/docs/${result.slug}${hash}`);
-  }, [router]);
+  }, [router, query]);
 
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") { e.preventDefault(); setCursor((c) => Math.min(c + 1, results.length - 1)); }

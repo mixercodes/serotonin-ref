@@ -10,20 +10,78 @@ interface Props {
   content: string;
 }
 
+function applySearchHighlights(query: string): () => void {
+  const q = query.trim();
+  if (!q) return () => {};
+
+  const container = document.querySelector(".prose");
+  if (!container) return () => {};
+
+  const marked: HTMLElement[] = [];
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      // Skip text inside code blocks (pre > code), allow inline code
+      if ((node as Text).parentElement?.closest("pre")) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+
+  const textNodes: Text[] = [];
+  let n: Node | null;
+  while ((n = walker.nextNode())) textNodes.push(n as Text);
+
+  for (const textNode of textNodes) {
+    const text = textNode.textContent ?? "";
+    const idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if (idx === -1) continue;
+    try {
+      const range = document.createRange();
+      range.setStart(textNode, idx);
+      range.setEnd(textNode, idx + q.length);
+      const mark = document.createElement("mark");
+      mark.className = "search-term-highlight";
+      range.surroundContents(mark);
+      marked.push(mark);
+    } catch {
+      // surroundContents throws on cross-element ranges — skip
+    }
+  }
+
+  return () => {
+    for (const mark of marked) {
+      const parent = mark.parentNode;
+      if (!parent) continue;
+      while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+      parent.removeChild(mark);
+      parent.normalize();
+    }
+  };
+}
+
 export default function MarkdownContent({ content }: Props) {
   useEffect(() => {
     const hash = window.location.hash.slice(1);
-    if (!hash) return;
+    const query = sessionStorage.getItem("search-query") ?? "";
+    sessionStorage.removeItem("search-query");
+
+    let cleanup: (() => void) | undefined;
 
     const frame = requestAnimationFrame(() => {
-      const el = document.getElementById(hash);
-      if (!el) return;
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      el.classList.add("anchor-highlight");
-      el.addEventListener("animationend", () => el.classList.remove("anchor-highlight"), { once: true });
+      if (hash) {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          el.classList.add("anchor-highlight");
+          el.addEventListener("animationend", () => el.classList.remove("anchor-highlight"), { once: true });
+        }
+      }
+      cleanup = applySearchHighlights(query);
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      cleanup?.();
+    };
   }, [content]);
 
   return (

@@ -238,6 +238,14 @@ body {
 
 .anchor-highlight { animation: anchor-flash 1.2s ease-out; }
 
+mark.search-term-highlight {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+  font-style: inherit;
+}
+
 /* ─────────────────────────────────────────────────────────────────
    Sidebar active state
    ───────────────────────────────────────────────────────────────── */
