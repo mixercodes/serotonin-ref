@@ -73,6 +73,5 @@ Tools and what they're for:
 
 ## Git
 
-- `master` deploys to Vercel — only merge here when ready to ship
-- `dev` is the working branch — CLAUDE.md lives here only
+- `master` is the only branch — deploys to Vercel on push
 - No `Co-Authored-By` lines in commits
