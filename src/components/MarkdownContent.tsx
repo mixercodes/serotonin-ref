@@ -66,20 +66,24 @@ export default function MarkdownContent({ content }: Props) {
 
     let cleanup: (() => void) | undefined;
 
-    const frame = requestAnimationFrame(() => {
-      if (hash) {
-        const el = document.getElementById(hash);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-          el.classList.add("anchor-highlight");
-          el.addEventListener("animationend", () => el.classList.remove("anchor-highlight"), { once: true });
+    // setTimeout yields past Next.js's own post-navigation scroll reset;
+    // rAF inside ensures the browser has painted the new content.
+    const timer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        if (hash) {
+          const el = document.getElementById(hash);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            el.classList.add("anchor-highlight");
+            el.addEventListener("animationend", () => el.classList.remove("anchor-highlight"), { once: true });
+          }
         }
-      }
-      cleanup = applySearchHighlights(query);
-    });
+        cleanup = applySearchHighlights(query);
+      });
+    }, 50);
 
     return () => {
-      cancelAnimationFrame(frame);
+      clearTimeout(timer);
       cleanup?.();
     };
   }, [content]);

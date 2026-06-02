@@ -126,7 +126,7 @@ export default function Search({ index }: { index: SearchEntry[] }) {
     setOpen(false);
     if (query) sessionStorage.setItem("search-query", query);
     const hash = result.anchor ? `#${result.anchor}` : "";
-    router.push(`/docs/${result.slug}${hash}`);
+    router.push(`/docs/${result.slug}${hash}`, { scroll: false });
   }, [router, query]);
 
   const handleKey = (e: React.KeyboardEvent) => {
