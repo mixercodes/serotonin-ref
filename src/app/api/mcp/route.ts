@@ -4,7 +4,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { listPages, readPage, searchPages, getFunction } from "@/lib/mcp-tools";
+import { listPages, readPage, searchPages, getFunction, listFunctions, lookup } from "@/lib/mcp-tools";
 
 const TOOL_DEFS = [
   {
@@ -67,6 +67,37 @@ const TOOL_DEFS = [
       additionalProperties: false,
     },
   },
+  {
+    name: "list_functions",
+    description:
+      "List every function in a library with a one-line description each. " +
+      "Use this before get_function or lookup to discover what's available without reading the full page. " +
+      "Works for libraries (draw, entity), userdata (Vector3, Instance), and tools (agent).",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        library: { type: "string", description: "Library name (e.g. 'draw', 'entity', 'Vector3')" },
+        locale: { type: "string", enum: ["en", "ru"], default: "en" },
+      },
+      required: ["library"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "lookup",
+    description:
+      "Pull a function's full docs section using dotted notation (e.g. 'utility.GetTickCount', 'entity.GetPlayers'). " +
+      "Shorthand for get_function — use this when writing code.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        fn: { type: "string", description: "Dotted function reference, e.g. 'draw.Text'" },
+        locale: { type: "string", enum: ["en", "ru"], default: "en" },
+      },
+      required: ["fn"],
+      additionalProperties: false,
+    },
+  },
 ];
 
 function makeServer() {
@@ -87,6 +118,8 @@ function makeServer() {
       else if (name === "read_page") result = readPage(args ?? {});
       else if (name === "search_pages") result = searchPages(args ?? {});
       else if (name === "get_function") result = getFunction(args ?? {});
+      else if (name === "list_functions") result = listFunctions(args ?? {});
+      else if (name === "lookup") result = lookup(args ?? {});
       else throw new Error(`Unknown tool: ${name}`);
 
       return {
