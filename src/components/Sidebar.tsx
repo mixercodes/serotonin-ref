@@ -30,6 +30,41 @@ function ChevronRight() {
   );
 }
 
+function SectionIcon({ section, size = 11 }: { section: PageSection; size?: number }) {
+  if (section === "foundation") return (
+    // Lightning bolt — runtime execution
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M7 1.5L3.5 6.5H6L5 10.5L8.5 5.5H6L7 1.5Z"
+            stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"
+            fill="currentColor" fillOpacity="0.15" />
+    </svg>
+  );
+  if (section === "library") return (
+    // </> code brackets — API library
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M4.5 3L2 6l2.5 3M7.5 3L10 6l-2.5 3"
+            stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6.5 2.5l-1 7" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  );
+  if (section === "userdata") return (
+    // Cube — data object / userdata type
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M6 1.5L10.5 4v4L6 10.5L1.5 8V4L6 1.5z"
+            stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+      <path d="M6 1.5v9M1.5 4l4.5 2.5 4.5-2.5"
+            stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+  return (
+    // Wrench — tool
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <circle cx="8" cy="3.5" r="2" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M6.6 5L3 9.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const bySection = pagesBySection();
@@ -37,30 +72,33 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Close mobile overlay when viewport grows past mobile breakpoint
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth >= 768) setMobileOpen(false);
+      if (window.innerWidth >= 768) {
+        setMobileOpen(false);
+      } else {
+        // Collapsed state only makes sense on desktop — reset on mobile
+        setCollapsed(false);
+      }
     };
+    // Run once on mount so a page-load on mobile starts uncollapsed
+    if (window.innerWidth < 768) setCollapsed(false);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Listen for hamburger toggle dispatched from TopNav
   useEffect(() => {
     const handler = () => setMobileOpen((o) => !o);
     window.addEventListener("serotonin:sidebar-toggle", handler);
     return () => window.removeEventListener("serotonin:sidebar-toggle", handler);
   }, []);
 
-  // Close mobile overlay on navigation
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
   return (
     <>
-      {/* Mobile backdrop */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-20 md:hidden"
@@ -73,12 +111,9 @@ export default function Sidebar() {
         className={[
           "shrink-0 border-r border-bg-border bg-bg-surface flex-col overflow-hidden",
           "transition-[width] duration-200 ease-in-out",
-          // Mobile: fixed full-height overlay; desktop: in-flow
           "fixed inset-y-0 left-0 z-30 w-60",
           "md:relative md:z-auto",
-          // Desktop width: icon strip when collapsed, full when expanded
           collapsed ? "md:w-12" : "md:w-60",
-          // Visibility: hidden on mobile unless open; always visible on desktop
           mobileOpen ? "flex" : "hidden md:flex",
         ].join(" ")}
       >
@@ -87,10 +122,8 @@ export default function Sidebar() {
           {collapsed ? (
             <div className="flex items-center justify-center w-full">
               <Link href="/" aria-label="Home">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center"
-                  style={{ background: "var(--accent)" }}
-                >
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                     style={{ background: "var(--accent)" }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <circle cx="7" cy="7" r="3.5" fill="white" opacity="0.9" />
                     <circle cx="7" cy="7" r="6" stroke="white" strokeWidth="1.2" opacity="0.4" />
@@ -101,10 +134,8 @@ export default function Sidebar() {
           ) : (
             <div className="flex items-center justify-between w-full px-2">
               <Link href="/" className="flex items-center gap-2 group">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: "var(--accent)" }}
-                >
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                     style={{ background: "var(--accent)" }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <circle cx="7" cy="7" r="3.5" fill="white" opacity="0.9" />
                     <circle cx="7" cy="7" r="6" stroke="white" strokeWidth="1.2" opacity="0.4" />
@@ -117,7 +148,6 @@ export default function Sidebar() {
                   ref
                 </span>
               </Link>
-              {/* Collapse button — desktop only */}
               <button
                 onClick={() => setCollapsed(true)}
                 className="hidden md:flex p-1 rounded text-[--text-muted] hover:text-[--text] hover:bg-bg-elevated transition-colors shrink-0"
@@ -129,7 +159,6 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* Expand button when collapsed — desktop only */}
         {collapsed && (
           <div className="hidden md:flex justify-center py-2 border-b border-bg-border">
             <button
@@ -171,26 +200,13 @@ export default function Sidebar() {
                               : "text-[--text-muted] hover:text-[--text] hover:bg-bg-elevated",
                           ].join(" ")}
                         >
-                          {section === "library" && (
-                            <span className="text-[10px] font-mono shrink-0 text-[--text-muted]">
-                              lib
-                            </span>
-                          )}
-                          {section === "userdata" && (
-                            <span className="text-[10px] font-mono shrink-0 text-[--accent-2]">
-                              ud
-                            </span>
-                          )}
-                          {section === "tool" && (
-                            <span className="text-[10px] font-mono shrink-0 text-[--text-muted]">
-                              ⚙
-                            </span>
-                          )}
-                          {section === "foundation" && (
-                            <span className="text-[10px] shrink-0 text-[--accent]">
-                              ◆
-                            </span>
-                          )}
+                          <span className={`shrink-0 ${
+                            section === "foundation" ? "text-[--accent]" :
+                            section === "userdata"   ? "text-[--accent-2]" :
+                            "text-[--text-muted]"
+                          }`}>
+                            <SectionIcon section={section} size={collapsed ? 14 : 11} />
+                          </span>
                           {!collapsed && (
                             <span className="font-mono">{page.title}</span>
                           )}
