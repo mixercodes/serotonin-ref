@@ -36,6 +36,7 @@ All casings resolve — `instance.Position`, `instance.position`, and `instance.
 | `CanCollide` | `boolean` | **Writable** |
 | `MeshId` | `string` | Asset ID (MeshPart only) |
 | `TextureId` | `string` | Texture asset ID |
+| `SoundId` | `string` | Sound asset ID (Sound instances) |
 
 ### Humanoid
 

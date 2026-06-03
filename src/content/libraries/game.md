@@ -12,6 +12,8 @@ Entry point to the Roblox DataModel and a small set of cheat-side utilities. The
 | `game.Players` | Roblox `Players` service | always available |
 | `game.LocalPlayer` | Roblox `Player` | local user — use this, not `GetService("Players").LocalPlayer` which is `nil` in the sandbox |
 | `game.CameraPosition` | `Vector3` | live camera world position |
+| `game.DataModel` | userdata | the root DataModel instance |
+| `game.PlaceID` | `number` | current Roblox place ID |
 | `game.Lighting` | `nil` | not pre-resolved — use `game.GetService("Lighting")` |
 
 Other services (`RunService`, `ReplicatedStorage`, etc.) are not pre-resolved. Use `GetService` to fetch them.
@@ -26,9 +28,11 @@ game.GetService(name: string) → userdata | nil
 
 Returns the Roblox service whose ClassName is `name`. Returns `nil` for unknown names or non-string arguments. Passing `nil` raises.
 
-Services confirmed to return userdata: `Players`, `Lighting`, `Workspace`, `HttpService`, `RunService`, `TeleportService`, `UserInputService`, `ReplicatedStorage`, `StarterGui`, `MarketplaceService`.
+Services confirmed to return userdata: `Players`, `Workspace`, `ReplicatedStorage`, `RunService`, `UserInputService`, `TweenService`, `HttpService`, `StarterGui`, `StarterPack`, `Lighting`, `SoundService`, `Teams`, `TeleportService`, `MarketplaceService`.
 
 `ServerStorage` returns `nil` (server-side only).
+
+`Players:GetChildren()` returns Instance userdata with readable `.Name`, `.UserId` (number), `.Team` (string), and `.Character` (Instance). Standard metatable methods (`FindFirstChild`, `GetChildren`, etc.) all work on service instances.
 
 ```lua
 local rs  = game.GetService("ReplicatedStorage")

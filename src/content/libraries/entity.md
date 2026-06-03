@@ -28,7 +28,7 @@ Every value returned by `GetPlayers`, `GetLocalPlayer`, and `GetTarget` is a pla
 | `IsEnemy` | `bool` | `true` if on the opposing team |
 | `IsVisible` | `bool` | `true` when not occluded. **Requires at least one Visible Only check active** in Serotonin (ESP, Aimbot, or Triggerbot) — returns `false` when none are enabled |
 | `IsWhitelisted` | `bool` | `true` if added via `game.PlayerWhitelist` |
-| `BoundingBox` | `table {x, y, w, h}` | screen-space pixel rectangle; all zeros when off-screen |
+| `BoundingBox` | `table {x, y, w, h}` | screen-space pixel rectangle; **empty table `{}`** for teammates and dead players — always check `bb.w` exists before using |
 
 > **`Position` is stale.** In FFA and many competitive modes, `p.Position` stays at `(0,0,0)` for all living players. Use `p:GetBonePosition("HumanoidRootPart")` for live world position.
 
@@ -112,16 +112,16 @@ end)
 ## `GetParts` / `GetPartsCount`
 
 ```lua
-entity.GetParts()      → table of part indices
+entity.GetParts()      → table of numbers
 entity.GetPartsCount() → int
 ```
 
-The cheat's cached part list. Many games leave this empty. `GetPartsCount()` is cheaper when you only need the length.
+The cheat's cached part list. Returns a table of **raw numeric addresses** (not Instance userdata). Many games leave this empty — always check `GetPartsCount() > 0` first. `GetPartsCount()` is cheaper when you only need the length.
 
 ```lua
 if entity.GetPartsCount() > 0 then
-    for i, idx in ipairs(entity.GetParts()) do
-        print(i, idx)
+    for i, addr in ipairs(entity.GetParts()) do
+        print(i, string.format("0x%X", addr))
     end
 end
 ```
@@ -165,7 +165,7 @@ cheat.register("onPaint", function()
     for _, p in ipairs(entity.GetPlayers(true)) do
         if not p.IsAlive then goto continue end
         local bb = p.BoundingBox
-        if bb.w > 0 then
+        if bb and bb.w and bb.w > 0 then
             draw.Rect(bb.x, bb.y, bb.w, bb.h,
                 Color3.fromRGB(255, 80, 80), 1, 0, 255)
         end
