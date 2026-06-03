@@ -12,7 +12,7 @@ const THEMES: { id: Theme; label: string; accent: string; bg: string }[] = [
 ];
 
 export default function ThemeSelector() {
-  const [current, setCurrent] = useState<Theme>("gruvbox");
+  const [current, setCurrent] = useState<Theme>("default");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 

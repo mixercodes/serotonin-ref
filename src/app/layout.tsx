@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-const themeScript = `(function(){var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t||'gruvbox');})();`;
+const themeScript = `(function(){var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t||'default');})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const searchIndex = buildSearchIndex();
