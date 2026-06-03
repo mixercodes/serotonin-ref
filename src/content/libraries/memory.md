@@ -117,30 +117,31 @@ end
 ## `Scan`
 
 ```lua
-memory.Scan(pattern: string, returnAll?: bool, limit?: number, module?: string)
-    → number | table | nil
+memory.Scan(pattern: string) → number | nil
 ```
 
-AOB pattern scan. Space-separated hex bytes, `??` as wildcard. Returns absolute virtual addresses.
+AOB pattern scan. **Single-argument form only** — returns the first match address as a number, or `nil` if not found. Space-separated hex bytes, `??` as wildcard.
 
-| Behavior | Notes |
+**Range form and callback form crash the engine.** Only the single-argument signature is safe:
+
+| Form | Safe? |
 |---|---|
-| `returnAll = false` (default) | returns the first match as a number |
-| `returnAll = true` | returns a table of all matches |
-| `limit` | caps results when `returnAll = true`; `0` or negative = unlimited |
-| `module` | restrict scan to a named module — **full filename required** (`"ntdll.dll"`, not `"ntdll"`) |
+| `memory.Scan(pattern)` | Yes — returns first match as number |
+| `memory.Scan(pattern, start, end)` | **Crashes** |
+| `memory.Scan(pattern, callback)` | **Crashes** |
 
 ```lua
--- First match in process memory
+local addr = memory.Scan("90 ?? 90")
+if addr and memory.IsValid(addr) then
+    local val = memory.Read("byte", addr)
+end
+
+-- RIP-relative pointer resolution
 local addr = memory.Scan("48 8B 05 ?? ?? ?? ?? 48 8B 88")
 if addr and memory.IsValid(addr) then
     local disp   = memory.Read("int", addr + 3)
     local target = addr + 7 + disp
 end
-
--- All matches in a module
-local hits = memory.Scan("E8 ?? ?? ?? ?? 90", true, 0, "RobloxPlayerBeta.exe")
-for i, a in ipairs(hits) do print(i, string.format("0x%X", a)) end
 ```
 
 ---
