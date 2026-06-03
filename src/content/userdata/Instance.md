@@ -4,7 +4,94 @@ Roblox Instance userdata returned by `game.Workspace`, `:FindFirstChild`, and th
 
 **Property names are case-sensitive.** `instance.position` returns `nil`; `instance.Position` returns the value. Different Roblox classes expose different properties — reading a property that doesn't exist on the underlying class returns `nil` without error.
 
-**`IsA` compares ClassName, not inheritance.** `part:IsA("Instance")` returns `false`. Check `ClassName` directly against concrete class names.
+**`IsA` supports class hierarchy.** `part:IsA("BasePart")` returns `true` for a `MeshPart`. However it does not go all the way up — `part:IsA("Instance")` returns `false`. Use concrete or intermediate class names.
+
+## Properties
+
+All casings resolve — `instance.Position`, `instance.position`, and `instance.POSITION` all work.
+
+**Property names are case-sensitive** in the sense that a wrong spelling returns `nil` without error — but the sandbox accepts PascalCase, camelCase, and snake_case variants of each name.
+
+### Universal (all instances)
+
+| Property | Type | Notes |
+|---|---|---|
+| `Name` | `string` | Writable |
+| `ClassName` | `string` | Read-only |
+| `Parent` | `Instance` | The parent in the hierarchy |
+| `Address` | `number` | Low 32 bits of the C++ instance pointer — stable unique ID per session |
+
+### BasePart
+
+| Property | Type | Notes |
+|---|---|---|
+| `Position` | `Vector3` | World-space center, **writable** |
+| `Size` | `Vector3` | Bounding box dimensions |
+| `Velocity` | `Vector3` | Physics velocity, **writable** |
+| `Rotation` | `Vector3` | Euler XYZ in degrees |
+| `Color` | `Color3` | Surface color, **writable** |
+| `Material` | `string` | Material name |
+| `Transparency` | `number` | 0–1, **writable** |
+| `Reflectance` | `number` | 0–1, **writable** |
+| `CanCollide` | `boolean` | **Writable** |
+| `MeshId` | `string` | Asset ID (MeshPart only) |
+| `TextureId` | `string` | Texture asset ID |
+
+### Humanoid
+
+| Property | Type | Notes |
+|---|---|---|
+| `Health` | `number` | Current HP |
+| `MaxHealth` | `number` | Max HP |
+| `MoveDirection` | `Vector3` | Walk direction |
+
+### Camera
+
+| Property | Type | Notes |
+|---|---|---|
+| `LookVector` | `Vector3` | Forward axis of the camera CFrame |
+| `RightVector` | `Vector3` | Right axis |
+| `UpVector` | `Vector3` | Up axis |
+| `Fov` / `FieldOfView` | `number` | Field of view in radians. `1.2217...` ≈ 70° |
+| `CameraSubject` | `Instance` | The subject the camera follows |
+
+`CFrame` is **blocked** — raises `"property 'CFrame' does not exist"`.
+
+### Player (Instance via GetService)
+
+| Property | Type | Notes |
+|---|---|---|
+| `Character` | `Instance` | The player's character model |
+
+### Highlight
+
+| Property | Type | Notes |
+|---|---|---|
+| `FillColor` | `Color3` | |
+| `OutlineColor` | `Color3` | |
+| `FillTransparency` | `number` | |
+| `DepthMode` | `number` | |
+
+### ValueBase types
+
+| Property | Type | Notes |
+|---|---|---|
+| `Value` | `any` | Generic value accessor (StringValue, NumberValue, etc.) |
+
+Specific typed aliases also work: read `StringValue.Value`, `NumberValue.Value`, `BoolValue.Value`, `ObjectValue.Value` etc.
+
+### TextLabel / UI
+
+| Property | Type | Notes |
+|---|---|---|
+| `Text` | `string` | Text content |
+| `TextColor3` | `Color3` | Text color |
+
+### NOT accessible
+
+`CFrame`, `Anchored`, `Locked`, `Massless`, `AssemblyLinearVelocity` — all return `nil` or raise.
+
+---
 
 ## Tree walk
 
@@ -14,10 +101,10 @@ Roblox Instance userdata returned by `game.Workspace`, `:FindFirstChild`, and th
 | `:GetDescendants()` | table of all descendants (expensive on large trees) |
 | `:FindFirstChild(name)` | first child with matching Name, or `nil` |
 | `:FindFirstChildOfClass(className)` | first child with matching ClassName, or `nil` |
-| `:FindFirstAncestor(name)` | first ancestor with matching Name |
-| `:FindFirstAncestorOfClass(className)` | first ancestor with matching ClassName |
 | `:FindFirstDescendant(name)` | first descendant with matching Name |
 | `:FindFirstDescendantOfClass(className)` | first descendant with matching ClassName |
+| `:FindFirstAncestor(name)` | first ancestor with matching Name |
+| `:FindFirstAncestorOfClass(className)` | first ancestor with matching ClassName |
 
 ```lua
 local char = game.Workspace:FindFirstChild("PlayerName")
@@ -28,9 +115,10 @@ local hum  = char and char:FindFirstChildOfClass("Humanoid")
 ## Type and hierarchy
 
 ```lua
-instance:IsA(className)             → bool   -- ClassName equality, NOT inheritance
+instance:IsA(className)             → bool   -- supports class hierarchy: MeshPart:IsA("BasePart") = true
 instance:IsDescendantOf(ancestor)   → bool
 instance:IsAncestorOf(descendant)   → bool
+instance:Destroy()                           -- do NOT call on live game instances
 ```
 
 ## Attributes

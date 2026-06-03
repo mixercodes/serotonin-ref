@@ -8,6 +8,27 @@
 | **Utilities** | 5 (`GetScreenSize`, `GetTextSize`, `ComputeConvexHull`, `GetPartCorners`, `GetMesh` — callable anywhere) |
 | **Aliases** | two-form for single-word verbs (`Line`/`line`), three-form for multi-word names (`RectFilled`/`rectFilled`/`rect_filled`) |
 
+## onPaint requirement
+
+**All drawing primitives must be called from inside an `onPaint` callback.** Calling them from `onUpdate`, `onSlowUpdate`, or top-level script code raises an uncatchable `"C++ exception"` that crashes the agent.
+
+The following utility functions are safe to call anywhere:
+`GetTextSize`, `GetScreenSize`, `GetPartCorners`, `ComputeConvexHull`
+
+`GetMesh` exists but returns `nil` outside `onPaint` and may crash with certain instance types — treat as `onPaint`-only.
+
+## Known crash triggers
+
+| Call | Cause |
+|---|---|
+| Any primitive outside `onPaint` | C++ exception |
+| `draw.Text(...)` or `draw.TextOutlined(...)` with a size argument | Extra arg crashes — no size override |
+| `draw.Gradient(x,y,w,h,c1,c2,alpha,bool)` — 8 args | 8th arg not supported, crashes |
+| `draw.Polyline({}, ...)` — empty point table | C++ exception |
+| `draw.GetMesh(non-MeshPart)` | C++ exception |
+
+---
+
 ## Coordinate system
 
 `(0, 0)` is the top-left of the Roblox window. `x` increases right, `y` increases down. Units are pixels. Use `GetScreenSize` to get the window bounds.
@@ -129,16 +150,18 @@ draw.ConvexPolyFilled(pts, Color3.fromRGB(70, 130, 240), 180)
 ## `Gradient`
 
 ```lua
-draw.Gradient(x, y, w, h, c1: Color3, c2: Color3, isHorizontal: bool, alpha1?, alpha2?)
+draw.Gradient(x, y, w, h, c1: Color3, c2: Color3, alpha: number)
 ```
 
-Two-stop linear gradient inside a rectangle. `isHorizontal = true` blends left→right (c1→c2), `false` blends top→bottom. Both alpha arguments are `0..255`.
+Two-stop linear gradient inside a rectangle. Blends left→right (c1→c2). `alpha` is `0..255`.
+
+**No `isHorizontal` arg.** Passing an 8th argument crashes with a C++ exception. The gradient is always horizontal.
 
 ```lua
 draw.Gradient(100, 200, 200, 30,
     Color3.fromRGB(255, 50, 50),
     Color3.fromRGB(70, 130, 240),
-    true, 255, 255)
+    255)
 ```
 
 ---
@@ -146,16 +169,17 @@ draw.Gradient(100, 200, 200, 30,
 ## `Text` / `TextOutlined`
 
 ```lua
-draw.Text        (text: string, x, y, color: Color3, font?, alpha?, size?)
-draw.TextOutlined(text: string, x, y, color: Color3, font?, alpha?, size?)
+draw.Text        (text: string, x, y, color: Color3, font?, alpha?)
+draw.TextOutlined(text: string, x, y, color: Color3, font?, alpha?)
 ```
 
-`TextOutlined` adds a 1-pixel dark border around each character — preferred for anything rendered over the game world. `font` is one of the verified [font names](#fonts). `size` overrides the font's native pixel height. `alpha` is `0..255`.
+`TextOutlined` adds a 1-pixel dark border around each character — preferred for anything rendered over the game world. `font` is one of the verified [font names](#fonts). `alpha` is `0..255`.
+
+**No size argument.** Passing a 7th argument crashes with a C++ exception. Font size is fixed per font name.
 
 ```lua
 draw.TextOutlined("FPS: 144",  10, 10, Color3.fromRGB(230, 230, 230), "ConsolasBold", 255)
 draw.TextOutlined("AIM",       10, 30, Color3.fromRGB(90, 220, 120),  "Verdana",      255)
-draw.TextOutlined("BIG",       10, 60, Color3.fromRGB(255, 255, 255), "Verdana",      255, 36)
 ```
 
 ---

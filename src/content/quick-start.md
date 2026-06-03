@@ -39,6 +39,8 @@ Available: `ui`, `mouse`, `http`, `table`, `string`, `math`, `type`, `pairs`, `i
 
 Not available (return `nil` or error): `_G`, `_ENV`, `workspace`, `typeof`, `tick`, `time`, `delay`, `spawn`, `wait`, `task`, `Instance`, `CFrame`, `Vector2`, `Enum`, `os`, `io`, `debug`, `buffer`, `raknet`
 
+`coroutine` is fully available: `create`, `wrap`, `resume`, `yield`, `status`, `running`, `isyieldable`. `math`, `string`, and `table` are the full LuaJIT standard sets.
+
 > **`_G` does not exist in the sandbox.** Use bare globals: `_MY_FLAG = true`, not `_G._MY_FLAG = true`.
 
 ## Userdata vs table

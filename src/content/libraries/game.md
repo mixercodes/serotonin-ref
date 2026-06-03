@@ -57,6 +57,23 @@ end
 
 ---
 
+## `IsFocused`
+
+```lua
+game.IsFocused() → bool
+```
+
+Returns `true` when the Roblox window currently holds input focus. Use this to gate any input-injection logic (mouse clicks, key presses) so it doesn't fire while Roblox is in the background.
+
+```lua
+cheat.register("onUpdate", function()
+    if not game.IsFocused() then return end
+    -- input logic here
+end)
+```
+
+---
+
 ## `SilentAim`
 
 ```lua
