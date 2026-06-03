@@ -146,9 +146,9 @@ Note: `Value` for a boolean attribute may be exposed as a number in the sandbox.
 ## Visual / lifecycle
 
 ```lua
-instance:SetHighlightOnTop()
-instance:SetHighlightTransparency(value)
-instance:Destroy()
+instance:SetHighlightOnTop()              -- boolean or no arg (defaults to toggle)
+instance:SetHighlightTransparency(value)  -- any number accepted, no clamping; 0..1 assumed but unverified
+instance:Destroy()                        -- do NOT call on live game instances
 ```
 
 ## Patterns

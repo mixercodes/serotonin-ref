@@ -234,6 +234,8 @@ draw.GetTextSize(text: string, font?: string) → w: number, h: number
 
 Returns the pixel dimensions the text would occupy when rendered. Useful for centering or padding labels. Unknown font names fall back to the default.
 
+**The size argument is accepted but completely ignored.** Passing `14`, `24`, or any number produces identical output to omitting it. Font size is fixed per font name.
+
 ```lua
 local w, h = draw.GetTextSize("ESP", "Verdana")
 draw.Rect(10 - 2, 10 - 2, w + 4, h + 4, Color3.new(0, 0, 0), 1, 0, 128)

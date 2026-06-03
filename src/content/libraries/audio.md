@@ -9,12 +9,12 @@ Sound output: system beep, WAV playback, and a stop-all. 3 functions.
 ## `Beep`
 
 ```lua
-audio.Beep(freq_hz: number, duration_ms: number)
+audio.Beep(freq_hz: number, duration_ms: number, volume?: number)
 ```
 
 Windows `Beep` syscall. **Synchronous** — the script blocks for `duration_ms`. Avoid long durations on `onPaint`.
 
-Strings are coerced to numbers: `audio.Beep("440", 50)` works. Both arguments are required.
+`volume` accepts any number — `0`, `0.5`, `1.0`, `2.0`, `255` all work without error. Range is unconstrained; treat `0..1` as the intended range. Strings are coerced to numbers: `audio.Beep("440", 50)` works. First two arguments are required.
 
 ```lua
 -- Short alert tone

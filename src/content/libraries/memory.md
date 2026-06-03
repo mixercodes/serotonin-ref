@@ -126,9 +126,11 @@ AOB pattern scan. **Single-argument form only** — returns the first match addr
 
 | Form | Safe? |
 |---|---|
-| `memory.Scan(pattern)` | Yes — returns first match as number |
+| `memory.Scan(pattern)` | Safe when pattern matches quickly |
 | `memory.Scan(pattern, start, end)` | **Crashes** |
 | `memory.Scan(pattern, callback)` | **Crashes** |
+
+**A pattern that doesn't match also crashes.** The scan walks the full address space until it finds a match or runs out of memory — a rare or absent pattern causes a timeout/crash. Only scan for patterns you're confident exist in the process.
 
 ```lua
 local addr = memory.Scan("90 ?? 90")

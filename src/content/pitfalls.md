@@ -10,7 +10,8 @@ Calls that trigger native SEH exceptions inside the Serotonin DLL. `pcall` does 
 |---|---|
 | `audio.PlaySound(non-WAV)` | RIFF header is not validated before parsing. Empty string, short garbage, HTTP error pages — all crash. Always check `data:sub(1, 4) == "RIFF"` first |
 | `cheat.LoadString(code, name)` | Every 2-arg invocation raises an uncatchable `"C++ exception"`. Use standard `loadstring()` instead |
-| `memory.Scan(pattern, start, end)` or `memory.Scan(pattern, callback)` | **Crashes** — only the single-arg form `memory.Scan(pattern)` is safe |
+| `memory.Scan(pattern, start, end)` or `memory.Scan(pattern, callback)` | **Crashes** — only the single-arg form is safe |
+| `memory.Scan(pattern)` with a rare or absent pattern | **Crashes** — walks the full address space until match or OOM; only scan for patterns known to exist |
 | Any `draw.*` primitive outside `onPaint` | C++ exception. Safe outside `onPaint`: `GetTextSize`, `GetScreenSize`, `GetPartCorners`, `ComputeConvexHull` |
 | `draw.Text` / `draw.TextOutlined` with 7+ args | Extra size argument crashes — no size override exists |
 | `draw.Gradient` with 8+ args | 8th argument not supported |
