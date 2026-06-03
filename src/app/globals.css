@@ -5,36 +5,36 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────────────────────
-   Default — greyscale
+   VS Code Dark+ — microsoft/vscode
    ───────────────────────────────────────────────────────────────── */
 :root,
 [data-theme="default"] {
-  --bg-base:     #141414;
-  --bg-surface:  #1c1c1c;
-  --bg-elevated: #252525;
-  --bg-border:   #333333;
+  --bg-base:     #1e1e1e;
+  --bg-surface:  #252526;
+  --bg-elevated: #2d2d2d;
+  --bg-border:   #3e3e3e;
 
-  --accent:       #999999;
-  --accent-light: #c0c0c0;
-  --accent-2:     #777777;
+  --accent:       #569cd6;
+  --accent-light: #9cdcfe;
+  --accent-2:     #4ec9b0;
 
-  --text:         #e8e8e8;
-  --text-muted:   #808080;
+  --text:         #d4d4d4;
+  --text-muted:   #858585;
   --text-heading: #ffffff;
 
-  --code-bg:     #101010;
-  --code-inline: #222222;
-  --scrollbar:   #353535;
+  --code-bg:     #1e1e1e;
+  --code-inline: #2d2d2d;
+  --scrollbar:   #424242;
 
-  --hl-keyword:  #e8e8e8;
-  --hl-string:   #b0b0b0;
-  --hl-number:   #d0d0d0;
-  --hl-comment:  #606060;
-  --hl-title:    #ffffff;
-  --hl-builtin:  #c8c8c8;
-  --hl-attr:     #909090;
-  --hl-literal:  #d8d8d8;
-  --hl-operator: #787878;
+  --hl-keyword:  #c586c0;
+  --hl-string:   #ce9178;
+  --hl-number:   #b5cea8;
+  --hl-comment:  #6a9955;
+  --hl-title:    #dcdcaa;
+  --hl-builtin:  #4ec9b0;
+  --hl-attr:     #9cdcfe;
+  --hl-literal:  #569cd6;
+  --hl-operator: #d4d4d4;
 }
 
 /* ─────────────────────────────────────────────────────────────────
