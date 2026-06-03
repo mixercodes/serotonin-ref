@@ -58,7 +58,7 @@ export default function Sidebar() {
                     <li key={page.slug}>
                       <Link
                         href={href}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all ${
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all outline-none focus-visible:ring-1 focus-visible:ring-[--accent] ${
                           active
                             ? "sidebar-item-active font-medium"
                             : "text-[--text-muted] hover:text-[--text] hover:bg-bg-elevated"
