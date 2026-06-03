@@ -29,6 +29,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local dev notes
-CLAUDE.md
 
