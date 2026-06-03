@@ -2,14 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Theme = "default" | "gruvbox" | "nord" | "catppuccin" | "dark";
+type Theme = "default" | "gruvbox" | "nord" | "catppuccin";
 
 const THEMES: { id: Theme; label: string; accent: string; bg: string }[] = [
   { id: "gruvbox",    label: "Gruvbox",    accent: "#fe8019", bg: "#282828" },
   { id: "default",    label: "VS Code",    accent: "#569cd6", bg: "#1e1e1e" },
   { id: "nord",       label: "Nord",       accent: "#88c0d0", bg: "#2e3440" },
   { id: "catppuccin", label: "Catppuccin", accent: "#cba6f7", bg: "#1e1e2e" },
-  { id: "dark",       label: "Dark",       accent: "#e0e0e0", bg: "#1a1a1a" },
 ];
 
 export default function ThemeSelector() {

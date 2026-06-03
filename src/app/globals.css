@@ -38,38 +38,6 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   Dark — matches favicon
-   ───────────────────────────────────────────────────────────────── */
-[data-theme="dark"] {
-  --bg-base:     #1a1a1a;
-  --bg-surface:  #222222;
-  --bg-elevated: #2b2b2b;
-  --bg-border:   #383838;
-
-  --accent:       #e0e0e0;
-  --accent-light: #ffffff;
-  --accent-2:     #b0b0b0;
-
-  --text:         #e0e0e0;
-  --text-muted:   #6a6a6a;
-  --text-heading: #ffffff;
-
-  --code-bg:     #141414;
-  --code-inline: #262626;
-  --scrollbar:   #333333;
-
-  --hl-keyword:  #ffffff;
-  --hl-string:   #c0c0c0;
-  --hl-number:   #e0e0e0;
-  --hl-comment:  #505050;
-  --hl-title:    #ffffff;
-  --hl-builtin:  #d0d0d0;
-  --hl-attr:     #b0b0b0;
-  --hl-literal:  #e8e8e8;
-  --hl-operator: #787878;
-}
-
-/* ─────────────────────────────────────────────────────────────────
    Gruvbox Dark Hard — morhetz/gruvbox
    bg0_hard=#1d2021  bg0=#282828  bg1=#3c3836  bg2=#504945
    fg0=#fbf1c7  fg1=#ebdbb2  fg4=#a89984
