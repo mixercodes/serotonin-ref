@@ -15,16 +15,27 @@ Add one URL to your MCP config and every tool is available with no local install
 }
 ```
 
-**Tools:** `list_pages`, `read_page`, `search_pages`, `get_function`
+**Tools:**
+
+| Tool | Use when |
+|---|---|
+| `list_pages` | Need the full page inventory |
+| `list_functions` | Exploring what a library offers before looking anything up |
+| `lookup` | Writing code and need one function by dotted name (`utility.GetTickCount`) |
+| `get_function` | Same as `lookup` but with separate `library`/`name` params |
+| `search_pages` | Don't know which page a concept lives on |
+| `read_page` | Need the full markdown for a page |
 
 ## Typical agent flow
 
 ```
-1. list_pages → discover all available pages
-2. search_pages({ query: "WorldToScreen" }) → locate relevant pages
-3. get_function({ library: "utility", name: "WorldToScreen" }) → read one function
-4. read_page({ slug: "libraries/draw" }) → read a full library page
+1. list_functions({ library: "draw" })           → discover what's in a library
+2. lookup({ fn: "utility.GetTickCount" })         → read one function by dotted name
+3. search_pages({ query: "WorldToScreen" })       → locate a concept across pages
+4. read_page({ slug: "libraries/draw" })          → read a full library page
 ```
+
+Prefer `list_functions` → `lookup` over `read_page` when writing code — lookup results are much smaller.
 
 ## Prompt snippet for Serotonin scripting agents
 
