@@ -244,5 +244,5 @@ mark.search-term-highlight {
 .sidebar-item-active {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent-light);
-  border-right: 2px solid var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
 }
