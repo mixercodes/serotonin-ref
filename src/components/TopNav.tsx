@@ -29,9 +29,9 @@ function SearchTrigger() {
 
 export default function TopNav({ searchIndex: _ }: { searchIndex?: SearchEntry[] }) {
   return (
-    <header className="h-14 flex items-center justify-between px-6 border-b border-bg-border bg-bg-surface sticky top-0 z-10">
-      <div className="flex items-center gap-4">
-        <span className="text-xs text-[--text-muted] font-mono">
+    <header className="h-14 flex items-center justify-between gap-4 px-6 border-b border-bg-border bg-bg-surface sticky top-0 z-10">
+      <div className="flex items-center gap-4 min-w-0">
+        <span className="text-xs text-[--text-muted] font-mono truncate">
           Serotonin Lua API Reference
         </span>
         <span className="text-[--bg-border]">·</span>
@@ -46,7 +46,7 @@ export default function TopNav({ searchIndex: _ }: { searchIndex?: SearchEntry[]
           v1.0.0
         </span>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 shrink-0">
         <SearchTrigger />
         <ThemeSelector />
         <div className="w-px h-4 bg-bg-border" />
