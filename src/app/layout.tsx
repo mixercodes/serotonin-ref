@@ -23,15 +23,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const searchIndex = buildSearchIndex();
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-dvh overscroll-none">
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="flex h-screen overflow-hidden bg-bg-base">
+      <body className="flex h-dvh overflow-hidden overscroll-none bg-bg-base">
         <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
           <TopNav searchIndex={searchIndex} />
           {children}
         </div>
