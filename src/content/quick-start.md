@@ -9,7 +9,7 @@ Scripts register callbacks — there is no `while true` loop. Register with `che
 | Event | Fires | Use for |
 |---|---|---|
 | `onPaint` | Every frame (60–250 Hz) | All `draw.*` calls — required context |
-| `onUpdate` | ~5 ms | Game logic, aim, entity queries |
+| `onUpdate` | ~10 ms | Game logic, aim, entity queries |
 | `onSlowUpdate` | ~1 s | Background checks, logging |
 | `shutdown` | On script unload | Cleanup, save state |
 | `newPlace` | Place change | Reset cached instance refs |

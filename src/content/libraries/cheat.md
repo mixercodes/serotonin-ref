@@ -24,7 +24,7 @@ Attaches `callback` to be called whenever `event` fires. Both casing forms are a
 | Name | Fires | Use for |
 |---|---|---|
 | `onPaint` | Every frame | All `draw.*` calls |
-| `onUpdate` | ~5 ms | Game logic, aim, entity queries |
+| `onUpdate` | ~10 ms | Game logic, aim, entity queries |
 | `onSlowUpdate` | ~1 s | Background checks, logging |
 | `shutdown` | Script unload | Cleanup, saving state |
 | `newPlace` | Server/place change | Resetting cached instance refs |
