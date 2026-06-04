@@ -49,9 +49,9 @@ export default function TopNav({ searchIndex: _, buildLabel }: { searchIndex?: S
         <span className="text-xs text-[--text-muted] font-mono truncate">
           Serotonin Lua API Reference
         </span>
-        <span className="text-[--bg-border]">·</span>
+        <span className="hidden sm:inline text-[--bg-border]">·</span>
         <span
-          className="text-xs font-mono px-2 py-0.5 rounded border"
+          className="hidden sm:inline text-xs font-mono px-2 py-0.5 rounded border whitespace-nowrap"
           style={{
             color: "var(--accent-light)",
             background: "color-mix(in srgb, var(--accent) 10%, transparent)",
