@@ -16,9 +16,39 @@ export async function generateMetadata({ params }: Props) {
   const slugStr = slug.join("/");
   const page = PAGES.find((p) => p.slug === slugStr);
   if (!page) return {};
+
+  // Pull first non-heading, non-empty line from content as description
+  let description = `Serotonin Lua API reference for ${page.title}.`;
+  try {
+    const raw = fetchPage(slugStr);
+    const stripped = raw.startsWith("---")
+      ? raw.slice(raw.indexOf("\n---", 3) + 4).trimStart()
+      : raw;
+    const firstPara = stripped
+      .split("\n")
+      .map((l) => l.trim())
+      .find((l) => l.length > 20 && !l.startsWith("#") && !l.startsWith("|") && !l.startsWith("```") && !l.startsWith(">"));
+    if (firstPara) description = firstPara.replace(/\*\*|`/g, "").slice(0, 160);
+  } catch {}
+
+  const title = `${page.title} — Serotonin API Reference`;
+  const url = `https://serotonin-ref.vercel.app/docs/${slugStr}`;
+
   return {
-    title: `${page.title} — Serotonin API Reference`,
-    description: `Serotonin Lua API docs for ${page.title}`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "Serotonin API Reference",
+      type: "article",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 
