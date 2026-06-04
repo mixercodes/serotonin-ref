@@ -105,7 +105,7 @@ export default function Home() {
 
       {/* Quick links */}
       <section className="px-10 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl">
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-widest mb-3 text-[--text-muted]">
               Runtime
@@ -148,6 +148,25 @@ export default function Home() {
                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
                   >
                     <span className="text-[9px] font-mono shrink-0 text-[--text-muted]">lib</span>
+                    <span className="font-mono">{p.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-widest mb-3 text-[--text-muted]">
+              Userdata
+            </h2>
+            <ul className="space-y-1">
+              {userdata.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/docs/${p.slug}`}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
+                  >
+                    <span className="text-[9px] font-mono shrink-0 text-[--text-muted]">ud</span>
                     <span className="font-mono">{p.title}</span>
                   </Link>
                 </li>
