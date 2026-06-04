@@ -2,7 +2,7 @@ import Link from "next/link";
 import { pagesBySection } from "@/lib/pages";
 
 export default function Home() {
-  const { library, foundation, tool } = pagesBySection();
+  const { library, foundation, tool, userdata } = pagesBySection();
 
   return (
     <main className="flex-1 overflow-y-auto min-h-0">
@@ -37,8 +37,8 @@ export default function Home() {
           </h1>
           <p className="max-w-xl mb-2 text-[--text-muted]">
             Docs for the Serotonin scripting runtime.{" "}
-            <span className="text-[--text]">14 libraries</span>,{" "}
-            <span className="text-[--text]">5 userdata types</span>,
+            <span className="text-[--text]">{library.length} libraries</span>,{" "}
+            <span className="text-[--text]">{userdata.length} userdata types</span>,
             and runtime-verified behaviour — all in one place.
           </p>
           <p className="text-sm mb-8 text-[--text-muted]">
