@@ -6,6 +6,8 @@ Asynchronous HTTPS client. 2 functions. Both return `nil` immediately — respon
 
 **Network failures are silent.** An unreachable host or DNS failure causes the callback to never fire. Add your own timeout if you need failure detection.
 
+**HTTPS verified live. Plain HTTP untested** — use `https://` URLs.
+
 ---
 
 ## `Get`
