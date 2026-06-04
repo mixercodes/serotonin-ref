@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pagesBySection } from "@/lib/pages";
+import PageIcon from "@/components/PageIcon";
 
 export default function Home() {
   const { library, foundation, tool, userdata } = pagesBySection();
@@ -117,7 +118,7 @@ export default function Home() {
                     href={`/docs/${p.slug}`}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
                   >
-                    <span className="text-[10px] text-[--accent]">◆</span>
+                    <span className="text-[--accent] shrink-0"><PageIcon slug={p.slug} size={12} /></span>
                     <span className="font-mono">{p.title}</span>
                   </Link>
                 </li>
@@ -128,7 +129,7 @@ export default function Home() {
                     href={`/docs/${p.slug}`}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
                   >
-                    <span className="text-[9px] font-mono shrink-0 text-[--text-muted]">⚙</span>
+                    <span className="text-[--text-muted] shrink-0"><PageIcon slug={p.slug} size={12} /></span>
                     <span className="font-mono">{p.title}</span>
                   </Link>
                 </li>
@@ -147,7 +148,7 @@ export default function Home() {
                     href={`/docs/${p.slug}`}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
                   >
-                    <span className="text-[9px] font-mono shrink-0 text-[--text-muted]">lib</span>
+                    <span className="text-[--text-muted] shrink-0"><PageIcon slug={p.slug} size={12} /></span>
                     <span className="font-mono">{p.title}</span>
                   </Link>
                 </li>
@@ -166,7 +167,7 @@ export default function Home() {
                     href={`/docs/${p.slug}`}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-[--text-muted] hover:text-[--text] hover:bg-bg-surface transition-all"
                   >
-                    <span className="text-[9px] font-mono shrink-0 text-[--text-muted]">ud</span>
+                    <span className="text-[--accent-2] shrink-0"><PageIcon slug={p.slug} size={12} /></span>
                     <span className="font-mono">{p.title}</span>
                   </Link>
                 </li>
