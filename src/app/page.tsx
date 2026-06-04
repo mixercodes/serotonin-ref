@@ -37,8 +37,8 @@ export default function Home() {
           </h1>
           <p className="max-w-xl mb-2 text-[--text-muted]">
             Docs for the Serotonin scripting runtime.{" "}
-            <span className="text-[--text]">17 libraries</span>,{" "}
-            <span className="text-[--text]">130 functions</span>,
+            <span className="text-[--text]">14 libraries</span>,{" "}
+            <span className="text-[--text]">5 userdata types</span>,
             and runtime-verified behaviour — all in one place.
           </p>
           <p className="text-sm mb-8 text-[--text-muted]">

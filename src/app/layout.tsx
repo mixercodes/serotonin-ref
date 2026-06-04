@@ -8,7 +8,7 @@ import { buildSearchIndex } from "@/lib/search-data";
 export const metadata: Metadata = {
   title: "Serotonin API Reference",
   description:
-    "Lua API reference for the Serotonin scripting runtime — 17 libraries, 130 functions, runtime-verified. Available as an MCP server.",
+    "Lua API reference for the Serotonin scripting runtime — 14 libraries, 5 userdata types, runtime-verified. Available as an MCP server.",
   metadataBase: new URL("https://serotonin-ref.vercel.app"),
   openGraph: {
     title: "Serotonin API Reference",
