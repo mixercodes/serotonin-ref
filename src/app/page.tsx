@@ -108,9 +108,11 @@ export default function Home() {
           <p className="text-xs mt-3 text-[--text-muted]">
             Tools:{" "}
             <code className="text-[--text]">list_pages</code>,{" "}
-            <code className="text-[--text]">read_page</code>,{" "}
+            <code className="text-[--text]">list_functions</code>,{" "}
+            <code className="text-[--text]">lookup</code>,{" "}
+            <code className="text-[--text]">get_function</code>,{" "}
             <code className="text-[--text]">search_pages</code>,{" "}
-            <code className="text-[--text]">get_function</code>
+            <code className="text-[--text]">read_page</code>
           </p>
         </div>
       </section>
