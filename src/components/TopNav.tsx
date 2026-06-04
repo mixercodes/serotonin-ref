@@ -41,7 +41,7 @@ function SearchTrigger() {
   );
 }
 
-export default function TopNav({ searchIndex: _ }: { searchIndex?: SearchEntry[] }) {
+export default function TopNav({ searchIndex: _, buildLabel }: { searchIndex?: SearchEntry[]; buildLabel?: string }) {
   return (
     <header className="h-14 flex items-center justify-between gap-4 px-4 md:px-6 border-b border-bg-border bg-bg-surface sticky top-0 z-10">
       <div className="flex items-center gap-3 min-w-0">
@@ -58,7 +58,7 @@ export default function TopNav({ searchIndex: _ }: { searchIndex?: SearchEntry[]
             borderColor: "color-mix(in srgb, var(--accent) 25%, transparent)",
           }}
         >
-          v1.0.0
+          {buildLabel ?? "dev"}
         </span>
       </div>
       <div className="flex items-center gap-4 shrink-0">

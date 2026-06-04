@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
-import TopNav from "@/components/TopNav";
+import BuildInfo from "@/components/BuildInfo";
 import Search from "@/components/Search";
 import { buildSearchIndex } from "@/lib/search-data";
 
@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex h-dvh overflow-hidden overscroll-none bg-bg-base">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-          <TopNav searchIndex={searchIndex} />
+          <BuildInfo />
           {children}
         </div>
         <Search index={searchIndex} />
