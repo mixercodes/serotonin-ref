@@ -4,7 +4,7 @@ Roblox Instance userdata returned by `game.Workspace`, `:FindFirstChild`, and th
 
 **Property names are case-sensitive.** `instance.position` returns `nil`; `instance.Position` returns the value. Different Roblox classes expose different properties — reading a property that doesn't exist on the underlying class returns `nil` without error.
 
-**`IsA` supports class hierarchy.** `part:IsA("BasePart")` returns `true` for a `MeshPart`. However it does not go all the way up — `part:IsA("Instance")` returns `false`. Use concrete or intermediate class names.
+**`IsA` does NOT support class hierarchy.** `part:IsA("BasePart")` returns `false` even for a regular `Part` or `MeshPart`. Only the exact ClassName matches: `part:IsA("Part")` = true, `meshpart:IsA("MeshPart")` = true. `IsA("Instance")` also returns `false`. Always use the concrete class name, never an ancestor class name.
 
 ## Properties
 
@@ -29,7 +29,7 @@ All casings resolve — `instance.Position`, `instance.position`, and `instance.
 | `Size` | `Vector3` | Bounding box dimensions |
 | `Velocity` | `Vector3` | Physics velocity, **writable** |
 | `Rotation` | `Vector3` | Euler XYZ in degrees |
-| `Color` | `Color3` | Surface color, **writable** |
+| `Color` | `Color3` | Surface color, **writable**. **`.R`, `.G`, `.B` are 0–255 integers** in Serotonin's sandbox (not 0–1 like standalone Color3). Use `Color3.fromRGB(c.R, c.G, c.B)` to convert. |
 | `Material` | `string` | Material name |
 | `Transparency` | `number` | 0–1, **writable** |
 | `Reflectance` | `number` | 0–1, **writable** |
@@ -56,7 +56,7 @@ All casings resolve — `instance.Position`, `instance.position`, and `instance.
 | `Fov` / `FieldOfView` | `number` | Field of view in radians. `1.2217...` ≈ 70° |
 | `CameraSubject` | `Instance` | The subject the camera follows |
 
-`CFrame` is **blocked** — raises `"property 'CFrame' does not exist"`.
+`CFrame` returns `nil` silently — it does **not** raise an error, but the value is always nil and unusable.
 
 ### Player (Instance via GetService)
 
@@ -90,7 +90,7 @@ Specific typed aliases also work: read `StringValue.Value`, `NumberValue.Value`,
 
 ### NOT accessible
 
-`CFrame`, `Anchored`, `Locked`, `Massless`, `AssemblyLinearVelocity` — all return `nil` or raise.
+`CFrame`, `Anchored`, `Locked`, `Massless`, `AssemblyLinearVelocity` — all return `nil` silently (no error raised).
 
 ---
 
@@ -116,7 +116,7 @@ local hum  = char and char:FindFirstChildOfClass("Humanoid")
 ## Type and hierarchy
 
 ```lua
-instance:IsA(className)             → bool   -- supports class hierarchy: MeshPart:IsA("BasePart") = true
+instance:IsA(className)             → bool   -- exact class name only; hierarchy NOT supported (Part:IsA("BasePart") = false)
 instance:IsDescendantOf(ancestor)   → bool
 instance:IsAncestorOf(descendant)   → bool
 instance:Destroy()                           -- do NOT call on live game instances

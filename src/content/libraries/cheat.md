@@ -96,7 +96,7 @@ local w, h = cheat.GetWindowSize()
 cheat.LoadString(code: string, name: string)
 ```
 
-Intended to compile and run Lua source. **Broken in current builds** — raises an uncatchable `"C++ exception"` for any valid input. `pcall` does not help.
+Intended to compile and run Lua source. **Broken in current builds** — raises `"C++ exception"` for any valid input. `pcall` catches it (returns `ok=false, "C++ exception"`) but LoadString still always fails regardless of input.
 
 Use standard `loadstring` instead:
 

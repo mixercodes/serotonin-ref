@@ -4,7 +4,7 @@ RGB color value used by all drawing calls and Roblox part properties.
 
 **No arithmetic operators.** `red + blue` raises an error. Use `:Lerp` or compute manually.  
 **`==` is identity-only.** Two value-equal colors are not `==` unless they are the same userdata.  
-**`.R`, `.G`, `.B` are `0..1` floats** (Roblox standard), but `tostring(c)` prints `0..255` bytes.
+**`.R`, `.G`, `.B` are `0..1` floats** on Color3 values you create (`Color3.new`, `Color3.fromRGB`, etc.), but `tostring(c)` prints `0..255` bytes. **Exception: Color3 values returned by Roblox Instance properties** (e.g. `part.Color`, `highlight.FillColor`) expose `.R`, `.G`, `.B` as `0..255` integers in Serotonin's sandbox — not 0..1. Use `Color3.fromRGB(c.R, c.G, c.B)` to convert them.
 
 ---
 

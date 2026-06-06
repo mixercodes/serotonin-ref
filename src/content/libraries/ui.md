@@ -34,7 +34,7 @@ NewTab("MY_TAB", "My Script")
 | `NewColorpicker` | `table {r, g, b, a}` (integers 0–255) | `table {r=, g=, b=, a=}` — **not** `Color3` |
 | `NewHotkey` | `bool` (true while bound key is held) | `number` (Windows VK code) |
 
-> **Dropdown / Listbox indices are 0-based.** `GetValue` returns `0` for the first option, `1` for the second, and so on. When indexing into a Lua table, add 1: `options[idx + 1]`. `SetValue` and the default argument to `NewDropdown` are also 0-based.
+> **Dropdown `GetValue` and `SetValue` are 0-based.** `GetValue` returns `0` for the first option, `1` for the second, and so on. `SetValue` takes a 0-based index. **The `default` 5th argument to `NewDropdown` is 1-based**: pass `1` for the first item, `2` for the second; omit for the first item. Passing `0` results in `GetValue = -1` (undefined — avoid).
 
 ---
 
@@ -121,11 +121,11 @@ ui.NewDropdown(tab, container, label, options: table, default?: number) → id
 ui.NewListbox (tab, container, label, options: table) → id
 ```
 
-`options` is a Lua array of strings. The `default` argument and all index values are **0-based**: `0` = first item. `GetValue` returns `0` for the first option.
+`options` is a Lua array of strings. `GetValue` and `SetValue` use **0-based** indices (`0` = first option). The `default` 5th argument is **1-based**: `1` = first item, `2` = second; omit to default to the first item. Passing `0` gives `GetValue = -1` (no selection — avoid).
 
 ```lua
 local MODES = { "Off", "Silent", "Legit" }
-ui.NewDropdown("MY_TAB", "MY_CON", "Mode", MODES, 0)  -- default: "Off"
+ui.NewDropdown("MY_TAB", "MY_CON", "Mode", MODES, 1)  -- default: "Off" (first item; 5th arg is 1-based)
 
 -- Read:
 local idx  = ui.GetValue("MY_TAB", "MY_CON", "Mode")
@@ -292,7 +292,7 @@ end
 
 ```lua
 local BONES = { "Head", "UpperTorso", "HumanoidRootPart" }
-ui.NewDropdown(TAB, CON, "Target Bone", BONES, 0)  -- default index 0 = "Head"
+ui.NewDropdown(TAB, CON, "Target Bone", BONES, 1)  -- default "Head" (first item; 5th arg is 1-based)
 
 cheat.register("onUpdate", function()
     local idx  = ui.GetValue(TAB, CON, "Target Bone")

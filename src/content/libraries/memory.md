@@ -24,7 +24,7 @@ Direct access to the Roblox process address space. Read typed values, write them
 | `ptr` / `pointer` | 8 | 8-byte pointer (aliases) |
 | `vector2` | 8 | returns Vector2 userdata |
 | `vector3` | 12 | returns Vector3 userdata |
-| `color3` | — | multi-return `r, g, b` (0..255) — the only type that returns 3 values |
+| `color3` | 12 | returns a single **Color3 userdata** (3×4-byte floats, channels 0..1). Access as `c.R`, `c.G`, `c.B` — **not** multi-return |
 | `cframe` | — | returns a table |
 
 Common names that do **not** work: `dword` (use `uint`), `qword` (use `uint64`), `long`/`longlong` (use `int64`), `int8/16/32`, `uint8/16/32`.
@@ -82,10 +82,11 @@ end
 memory.Read(type: string, addr: number) → value
 ```
 
-Typed read at `addr`. For `color3`, capture all three return values:
+Typed read at `addr`. For `color3`, capture a single Color3 userdata — it does **not** multi-return three values:
 
 ```lua
-local r, g, b = memory.Read("color3", addr)
+local c = memory.Read("color3", addr)
+local r, g, b = c.R, c.G, c.B   -- channels are 0..1 floats
 ```
 
 ```lua

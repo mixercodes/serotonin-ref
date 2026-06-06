@@ -293,7 +293,7 @@ end
 draw.GetMesh(part: Instance) → ?
 ```
 
-Returns mesh data for a `MeshPart`. Passing a regular `Part` raises `"Expected a MeshPart instance."`. Passing nothing or `nil` raises a type error.
+Returns mesh data for a `MeshPart`. Passing a regular `Part` or `nil` raises `"An unknown C++ exception occurred."` — the specific message does **not** include type information. In practice returns `nil` outside of `onPaint`; treat as `onPaint`-only.
 
 ---
 
