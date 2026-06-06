@@ -21,7 +21,7 @@ Userdata returned by `entity.GetPlayers()`, `entity.GetLocalPlayer()`, and `enti
 | `MaxHealth` | `number` | max HP |
 | `IsAlive` | `bool` | humanoid alive and spawned |
 | `IsEnemy` | `bool` | on the opposing team |
-| `IsVisible` | `bool` | **always `false`** — non-functional, do not use as a wall check |
+| `IsVisible` | `bool` | `true` when not occluded. **Requires at least one Visible Only check active in Serotonin** (ESP, Aimbot, or Triggerbot) — returns `false` for all players when none are enabled |
 | `IsWhitelisted` | `bool` | added via `game.PlayerWhitelist` |
 | `TeamColor` | `userdata` | `.R`, `.G`, `.B` are `0..255` bytes — use `Color3.fromRGB(tc.R, tc.G, tc.B)` |
 | `BoundingBox` | `table {x, y, w, h}` | screen-space pixel rect; all zeros when off-screen or teammate |
