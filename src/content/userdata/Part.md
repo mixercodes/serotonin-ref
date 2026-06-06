@@ -14,10 +14,10 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 
 | Method | Returns |
 |---|---|
-| `:GetPartPosition()` | `Vector3` — world-space center |
-| `:GetPartSize()` | `Vector3` — bounding box dimensions |
+| `:GetPartPosition()` | `number` — **raw value, not Vector3**. Use `:GetPartInstance().Position` for a usable Vector3. |
+| `:GetPartSize()` | `number` — **raw value, not Vector3**. Use `:GetPartInstance().Size` for a usable Vector3. |
 | `:GetPartRotation()` | `table` — flat 9-element rotation matrix |
-| `:GetPartCubeVertices()` | `table` — 8 OBB corner `Vector3` values |
+| `:GetPartCubeVertices()` | `table` — 8 entries, each a numeric table `{[1]=x, [2]=y, [3]=z}` — **not Vector3**. Wrap with `Vector3.new(v[1], v[2], v[3])` before passing to `utility.WorldToScreen`. |
 
 ### Identity
 
@@ -32,7 +32,7 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 
 | Method | Returns |
 |---|---|
-| `:GetPartColor()` | `Color3` |
+| `:GetPartColor()` | `number` — **raw value, not Color3**. Use `:GetPartInstance().Color` for a usable Color3. |
 | `:GetPartTransparency()` | `number` (0..1) |
 | `:GetPartMeshId()` | `string` or `nil` |
 
@@ -64,13 +64,18 @@ end)
 ### OBB box ESP
 
 ```lua
+local function vert_to_screen(v)
+    -- verts are {[1]=x,[2]=y,[3]=z} tables, not Vector3
+    return utility.WorldToScreen(Vector3.new(v[1], v[2], v[3]))
+end
+
 cheat.register("onPaint", function()
     for _, part in ipairs(entity.GetParts()) do
         local verts = part:GetPartCubeVertices()
         for i = 1, 8 do
             local j = (i % 8) + 1
-            local ax, ay, aon = utility.WorldToScreen(verts[i])
-            local bx, by, bon = utility.WorldToScreen(verts[j])
+            local ax, ay, aon = vert_to_screen(verts[i])
+            local bx, by, bon = vert_to_screen(verts[j])
             if aon and bon then
                 draw.Line(ax, ay, bx, by, Color3.fromRGB(255,200,50), 1, 255)
             end
