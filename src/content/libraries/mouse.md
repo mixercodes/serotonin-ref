@@ -8,8 +8,8 @@ Cursor position is in [`utility.GetMousePos`](./utility#getmousepos) and [`utili
 
 The button argument is accepted differently depending on which function you call.
 
-**`IsClicked`** accepts strings and small integers, but **string forms `"left"` and `"right"` are broken** — they always return `false` regardless of button state. Use numeric `1` for LMB and `2` for RMB. `"mouse4"` / `"mouse5"` are unverified:
-`1` (LMB), `2` (RMB), `4` (MMB), `"mouse4"`, `"mouse5"`
+**`IsClicked`** accepts numeric button codes and some strings, but **`"left"` and `"right"` are silently broken** — they always return `false` regardless of button state. `"middle"` crashes with `"Unknown key or button name"`. Use numeric codes:
+`1` (LMB), `2` (RMB), `4` (MMB), `"mouse4"`, `"mouse5"` (side buttons — accepted, not crash-tested held)
 
 **`Click` / `Press` / `Release`** only accept numeric VK codes and `"mouse4"` / `"mouse5"`:
 
