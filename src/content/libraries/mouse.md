@@ -8,8 +8,18 @@ Cursor position is in [`utility.GetMousePos`](./utility#getmousepos) and [`utili
 
 The button argument is accepted differently depending on which function you call.
 
-**`IsClicked`** accepts numeric button codes and some strings, but **`"left"` and `"right"` are silently broken** — they always return `false` regardless of button state. `"middle"` crashes with `"Unknown key or button name"`. Use numeric codes:
-`1` (LMB), `2` (RMB), `4` (MMB), `"mouse4"`, `"mouse5"` (side buttons — accepted, not crash-tested held)
+**`IsClicked`** accepts numeric codes and specific lowercase strings. **String matching is case-sensitive.**
+
+| Form | Works? | Notes |
+|---|---|---|
+| `1` | ✓ | LMB |
+| `2` | ✓ | RMB |
+| `4` | unverified | MMB (no crash, but not confirmed held) |
+| `"mouse4"` | ✓ | X1 side button — lowercase only |
+| `"mouse5"` | ✓ | X2 side button — lowercase only |
+| `"Mouse4"` / `"Mouse5"` | ✗ | Case-sensitive — returns `false` silently |
+| `"left"` / `"right"` | ✗ | **Silently broken** — always `false` even when held |
+| `"middle"` / `"xbutton1"` / `"xbutton2"` | ✗ | Crash: `"Unknown key or button name"` |
 
 **`Click` / `Press` / `Release`** only accept numeric VK codes and `"mouse4"` / `"mouse5"`:
 
