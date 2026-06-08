@@ -285,6 +285,17 @@ for _, e in ipairs(edges) do
 end
 ```
 
+**Corner ordering — recover center, rotation, and size without `CFrame`.** This is the only way to read a part's orientation in the sandbox (`part.CFrame` and `part.Orientation` are both `nil`). Verified by eval: `corners[1]` and `corners[8]` are diagonally opposite, and the three edges leaving `corners[1]` are the part's local axes scaled by its dimensions:
+
+| Quantity | From corners |
+|---|---|
+| center | `(corners[1] + corners[8]) / 2` — equals `part.Position` |
+| local X axis × `Size.X` | `corners[2] - corners[1]` (`|len| = Size.X`) |
+| local Y axis × `Size.Y` | `corners[3] - corners[1]` (`|len| = Size.Y`) |
+| local Z axis × `Size.Z` | `corners[5] - corners[1]` (`|len| = Size.Z`) |
+
+So `u = corners[2]-corners[1]`, `v = corners[3]-corners[1]`, `w = corners[5]-corners[1]` give the full oriented box (normalize for the rotation basis, take lengths for `Size`). Useful for exporting world geometry or building an oriented box mesh externally.
+
 ---
 
 ## `GetMesh`
