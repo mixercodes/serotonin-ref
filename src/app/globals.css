@@ -6,39 +6,39 @@
 
 /* ─────────────────────────────────────────────────────────────────
    Serotonin — single curated scheme
-   Deep slate canvas, violet primary, cyan secondary.
-   Everything keys off these custom properties.
+   GitHub-dimmed canvas, blue primary, purple secondary
+   (matched to docs.rbxcli.dev). Everything keys off these properties.
    ───────────────────────────────────────────────────────────────── */
 :root,
 [data-theme="default"] {
-  --bg-base:     #0a0b10;
-  --bg-surface:  #0f111a;
-  --bg-elevated: #161927;
-  --bg-border:   #232838;
+  --bg-base:     #0d1117;
+  --bg-surface:  #161b22;
+  --bg-elevated: #1c2128;
+  --bg-border:   #30363d;
 
-  --accent:        #8b5cf6;  /* violet 500 */
-  --accent-light:  #b39dfb;  /* violet 300-ish */
-  --accent-2:      #22d3ee;  /* cyan 400 */
-  --accent-glow:   rgba(139, 92, 246, 0.45);
+  --accent:        #58a6ff;  /* GitHub blue */
+  --accent-light:  #79c0ff;  /* link blue */
+  --accent-2:      #d2a8ff;  /* purple secondary */
+  --accent-glow:   rgba(88, 166, 255, 0.40);
 
-  --text:         #c5cce0;
-  --text-muted:   #6b7488;
-  --text-faint:   #4a5163;
-  --text-heading: #f2f4fb;
+  --text:         #cdd9e5;
+  --text-muted:   #8b949e;
+  --text-faint:   #6e7681;
+  --text-heading: #e6edf3;
 
-  --code-bg:     #0c0e16;
-  --code-inline: #181c2b;
-  --scrollbar:   #2a3042;
+  --code-bg:     #161b22;
+  --code-inline: #1c2128;
+  --scrollbar:   #30363d;
 
-  --hl-keyword:  #c084fc;
-  --hl-string:   #7dd3a8;
-  --hl-number:   #f0a868;
-  --hl-comment:  #5a6275;
-  --hl-title:    #e2c879;
-  --hl-builtin:  #22d3ee;
-  --hl-attr:     #93b8f5;
-  --hl-literal:  #c084fc;
-  --hl-operator: #8b94aa;
+  --hl-keyword:  #ff7b72;
+  --hl-string:   #a5d6ff;
+  --hl-number:   #79c0ff;
+  --hl-comment:  #8b949e;
+  --hl-title:    #d2a8ff;
+  --hl-builtin:  #ffa657;
+  --hl-attr:     #79c0ff;
+  --hl-literal:  #79c0ff;
+  --hl-operator: #ff7b72;
 }
 
 /* ─────────────────────────────────────────────────────────────────
