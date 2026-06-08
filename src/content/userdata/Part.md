@@ -38,10 +38,8 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 
 ### Spatial
 
-| Method | Returns |
-|---|---|
-| `:GetPartDistance()` | `number` — distance from local camera |
-| `:GetPartScreenPosition()` | `number, number, bool` — `screenX, screenY, onScreen` |
+> [!WARNING]
+> **No built-in screen-projection or distance methods in the current build.** `:GetPartScreenPosition()` and `:GetPartDistance()` are **not bound** on the Part userdata — both index to `nil` and raise *"attempt to call method … (a nil value)"*. Project manually by feeding `:GetPartInstance().Position` (a real `Vector3`) into `utility.WorldToScreen`, and compute distance yourself against a reference position such as `entity.GetLocalPlayer():GetBonePosition("HumanoidRootPart")`.
 
 ---
 
@@ -49,13 +47,19 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 
 ### Render all visible cached parts
 
+`GetPartScreenPosition` does not exist — project the instance position yourself:
+
 ```lua
 cheat.register("onPaint", function()
     if entity.GetPartsCount() == 0 then return end
     for _, part in ipairs(entity.GetParts()) do
-        local x, y, on = part:GetPartScreenPosition()
-        if on then
-            draw.Circle(x, y, 4, Color3.fromRGB(255, 200, 50), 1, 12, 200)
+        local inst = part:GetPartInstance()
+        local pos  = inst and inst.Position          -- a real Vector3
+        if pos then
+            local x, y, on = utility.WorldToScreen(pos)
+            if on then
+                draw.Circle(x, y, 4, Color3.fromRGB(255, 200, 50), 1, 12, 200)
+            end
         end
     end
 end)
