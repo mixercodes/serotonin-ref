@@ -33,4 +33,8 @@ next-env.d.ts
 .claude/
 .mcp.json
 
+# Playwright MCP scratch (screenshots, console logs)
+.playwright-mcp/
+*.png
+
 
