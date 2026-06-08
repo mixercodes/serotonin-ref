@@ -6,8 +6,8 @@
 
 /* ─────────────────────────────────────────────────────────────────
    Serotonin — single curated scheme
-   GitHub-dimmed canvas, blue primary, purple secondary
-   (matched to docs.rbxcli.dev). Everything keys off these properties.
+   GitHub dark theme: blue-forward, cyan secondary, no purple.
+   Green / amber / red reserved for semantic callouts only.
    ───────────────────────────────────────────────────────────────── */
 :root,
 [data-theme="default"] {
@@ -18,7 +18,7 @@
 
   --accent:        #58a6ff;  /* GitHub blue */
   --accent-light:  #79c0ff;  /* link blue */
-  --accent-2:      #d2a8ff;  /* purple secondary */
+  --accent-2:      #39c5cf;  /* cyan secondary */
   --accent-glow:   rgba(88, 166, 255, 0.40);
 
   --text:         #cdd9e5;
@@ -34,7 +34,7 @@
   --hl-string:   #a5d6ff;
   --hl-number:   #79c0ff;
   --hl-comment:  #8b949e;
-  --hl-title:    #d2a8ff;
+  --hl-title:    #79c0ff;
   --hl-builtin:  #ffa657;
   --hl-attr:     #79c0ff;
   --hl-literal:  #79c0ff;

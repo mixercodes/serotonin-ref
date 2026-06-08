@@ -2,7 +2,7 @@
 
 /**
  * Serotonin brand mark — a brain (the real serotonin.win logo motif) rendered
- * in our blue→purple theme. White hemispheres with accent-tinted folds on a
+ * in our blue→cyan theme. White hemispheres with accent-tinted folds on a
  * gradient rounded square. Reads cleanly from 14px up.
  */
 export default function BrandMark({ size = 28, radius }: { size?: number; radius?: number }) {

@@ -17,17 +17,6 @@ const config: Config = {
           light:   "var(--accent-light)",
           2:       "var(--accent-2)",
         },
-        // keep violet/cyan for any remaining hardcoded usages
-        violet: {
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9",
-        },
-        cyan: {
-          400: "#22d3ee",
-          500: "#06b6d4",
-        },
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],

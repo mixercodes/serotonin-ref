@@ -2,7 +2,7 @@ import type { DocPage, PageSection } from "@/lib/pages";
 
 const SECTION_META: Record<PageSection, { label: string; color: string }> = {
   library:    { label: "library",  color: "#58a6ff" },
-  userdata:   { label: "userdata", color: "#d2a8ff" },
+  userdata:   { label: "userdata", color: "#39c5cf" },
   foundation: { label: "guide",    color: "#3fb950" },
   tool:       { label: "tool",     color: "#ffa657" },
 };

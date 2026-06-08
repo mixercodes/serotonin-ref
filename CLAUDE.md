@@ -51,7 +51,7 @@ That's it — search index, sidebar, prev/next, and MCP `list_pages` all derive 
 
 ## Theming & motion
 
-Single curated scheme — deep slate canvas, violet primary (`--accent`), cyan secondary (`--accent-2`). All colors are CSS custom properties set on `:root` / `[data-theme="default"]` in `globals.css`. The old multi-theme switcher was removed; `data-theme="default"` is hardcoded on `<html>`.
+Single curated scheme — **GitHub dark**: `#0d1117` canvas, blue primary (`--accent` `#58a6ff`), cyan secondary (`--accent-2` `#39c5cf`), no purple. Green/amber/red are reserved for semantic callouts only. All colors are CSS custom properties set on `:root` / `[data-theme="default"]` in `globals.css`. The old multi-theme switcher was removed; `data-theme="default"` is hardcoded on `<html>`.
 
 Never hardcode colors — always use CSS variables (`--accent`, `--bg-base`, `--text`, …).
 
