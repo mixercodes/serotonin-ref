@@ -39,7 +39,7 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 ### Spatial
 
 > [!WARNING]
-> **No built-in screen-projection or distance methods in the current build.** `:GetPartScreenPosition()` and `:GetPartDistance()` are **not bound** on the Part userdata — both index to `nil` and raise *"attempt to call method … (a nil value)"*. Project manually by feeding `:GetPartInstance().Position` (a real `Vector3`) into `utility.WorldToScreen`, and compute distance yourself against a reference position such as `entity.GetLocalPlayer():GetBonePosition("HumanoidRootPart")`.
+> **No built-in screen-projection or distance methods in the current build.** `:GetPartScreenPosition()` and `:GetPartDistance()` are **not bound** on the Part userdata — both index to `nil` and raise *"attempt to call method … (a nil value)"*. Project manually by feeding `:GetPartInstance().Position` (a real `Vector3`) into `utility.WorldToScreen`, and compute camera distance as `(part:GetPartInstance().Position - game.CameraPosition).Magnitude`.
 
 ---
 

@@ -19,6 +19,9 @@ Entry point to the Roblox DataModel and a small set of cheat-side utilities. The
 
 Other services (`RunService`, `ReplicatedStorage`, etc.) are not pre-resolved. Use `GetService` to fetch them.
 
+> [!NOTE]
+> Only `PlaceID` is exposed — `game.JobID`, `game.GameId`, and `game.CreatorId` are **not** available (all `nil`, in every casing). The current server's Job ID that `utility.TeleportToPlace` consumes has to be sourced elsewhere (e.g. an `http.Get` to the Roblox games API).
+
 ---
 
 ## `GetService`
