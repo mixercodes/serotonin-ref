@@ -14,6 +14,8 @@ RGB color value used by all drawing calls and Roblox part properties.
 Color3.new(r, g, b) → Color3   -- components in 0..1
 ```
 
+Out-of-range channels clamp to `[0, 1]` with no error — `Color3.new(2, -1, 0.5)` becomes `(1, 0, 0.5)`.
+
 ```lua
 local c = Color3.new(0.9, 0.5, 0.1)   -- warm orange
 ```

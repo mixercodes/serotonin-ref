@@ -15,6 +15,8 @@ Three-component float vector used for positions, sizes, velocities, and directio
 
 All static functions also work as instance methods: `v:Dot(other)` = `Vector3.Dot(v, other)`.
 
+`Magnitude` is the length; `Unit` is the normalized direction. **`Vector3.zero.Unit` returns `(0,0,0)`, not `nan`** — Serotonin guards the zero-length case, so reading `.Unit` on a possibly-zero vector is safe without a divide-by-zero check.
+
 ---
 
 ## `new`
@@ -42,7 +44,7 @@ local point = Vector3.new(120.5, 30, -88.2)
 | `a / k` | `(1,2,3) / 2` | `(0.5,1,1.5)` |
 | `-a`    | `-(1,2,3)` | `(-1,-2,-3)` |
 
-**`Vector3 * Vector3` silently returns `(0,0,0)`.** Use `Dot` for scalar product or multiply component-by-component manually.
+**Only scalar `*` and `/` are valid — and the two fail differently.** `Vector3 * Vector3` silently returns `(0,0,0)` (the vector operand is coerced to `0`), while `Vector3 / Vector3` *raises* an error. Guard against both: use `Dot` for the scalar product, or multiply/divide component-by-component manually.
 
 ---
 

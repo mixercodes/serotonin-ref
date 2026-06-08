@@ -36,9 +36,22 @@ utility.get_tick_count()
 
 ## Sandbox globals
 
-Available: `ui`, `mouse`, `http`, `table`, `string`, `math`, `type`, `pairs`, `ipairs`, `pcall`, `xpcall`, `loadstring`, `print`, `tostring`, `tonumber`, `error`, `select`, `unpack`, `coroutine`, `entity`, `websocket`, `audio`, `memory`, `file`, `keyboard`, `Color3`, `game`, `cheat`, `bit`, `draw`, `utility`, `Vector3`, `module`, `assert`, `require`
+**Serotonin:** `ui`, `mouse`, `keyboard`, `http`, `websocket`, `audio`, `memory`, `file`, `entity`, `game`, `cheat`, `draw`, `utility`, `bit` · userdata constructors `Vector3`, `Color3`.
 
-Not available (return `nil` or error): `_G`, `_ENV`, `workspace`, `typeof`, `tick`, `time`, `delay`, `spawn`, `wait`, `task`, `Instance`, `CFrame`, `Vector2`, `Enum`, `os`, `io`, `debug`, `buffer`, `raknet`
+**Standard Lua 5.1** (`_VERSION` is `"Lua 5.1"`) — more is present than you might expect:
+
+| Group | Globals |
+|---|---|
+| Core | `type`, `tostring`, `tonumber`, `pairs`, `ipairs`, `next`, `select`, `unpack`, `print`, `error`, `assert`, `pcall`, `xpcall` |
+| Libraries | `table`, `string`, `math`, `coroutine` (full LuaJIT sets) |
+| Metatables / raw | `setmetatable`, `getmetatable`, `rawget`, `rawset`, `rawequal`, `newproxy` |
+| Env / loading | `getfenv`, `setfenv`, `load`, `loadstring`, `loadfile`, `dofile`, `require`, `module`, `package` |
+| GC | `collectgarbage`, `gcinfo` |
+
+**Not available** (return `nil`, or error when called): `_G`, `_ENV`, `workspace`, `typeof`, `tick`, `time`, `delay`, `spawn`, `wait`, `task`, `Instance`, `CFrame`, `Vector2`, `Enum`, `Region3`, `UDim2`, `TweenInfo`, `Ray`, `Random`, `DateTime`, `Drawing`, `os`, `io`, `debug`, `jit`, `ffi`, `buffer`, `raknet`.
+
+> [!NOTE]
+> Coming from a Roblox executor? `Drawing`, `Instance`, `task`, `tick`, and `typeof` are **not** here — use `draw.*` (inside `onPaint`), `cheat.register`, and `utility.GetTickCount` instead.
 
 `coroutine` is fully available: `create`, `wrap`, `resume`, `yield`, `status`, `running`, `isyieldable`. `math`, `string`, and `table` are the full LuaJIT standard sets.
 
