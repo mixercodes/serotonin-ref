@@ -76,24 +76,11 @@ export default async function DocPage({ params }: Props) {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-3xl mx-auto px-8 py-10">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-xs text-[--text-muted] mb-6 font-mono">
-          <span className="cursor-default">docs</span>
-          {slug.map((part, i) => (
-            <span key={i} className="flex items-center gap-1.5">
-              <span className="text-[--bg-border]">/</span>
-              <span className={i === slug.length - 1 ? "text-[--accent-light]" : ""}>
-                {part}
-              </span>
-            </span>
-          ))}
-        </div>
-
+      <div className="max-w-5xl mx-auto px-5 md:px-8 lg:px-12 pt-16 pb-16">
         <MarkdownContent content={content} />
 
         {/* Prev/Next nav */}
-        <div className="mt-12 pt-6 border-t border-bg-border flex items-center justify-between">
+        <div className="mt-14 pt-6 border-t border-bg-border flex items-center justify-between gap-4">
           <PrevNext current={slugStr} />
         </div>
       </div>
@@ -111,12 +98,15 @@ function PrevNext({ current }: { current: string }) {
       {prev ? (
         <a
           href={`/docs/${prev.slug}`}
-          className="flex items-center gap-2 text-sm text-[--text-muted] hover:text-[--accent-light] transition-colors"
+          className="group flex items-center gap-3 rounded-xl border border-bg-border bg-bg-surface/40 px-4 py-3 transition-all hover:border-[color-mix(in_srgb,var(--accent)_45%,transparent)] hover:bg-bg-elevated/60 hover:-translate-y-0.5"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <svg width="15" height="15" viewBox="0 0 14 14" fill="none" className="text-[--text-muted] transition-transform group-hover:-translate-x-0.5 group-hover:text-[--accent-light]">
             <path d="M9 2L5 7l4 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span className="font-mono">{prev.title}</span>
+          <span className="text-left">
+            <span className="block text-[10px] uppercase tracking-widest text-[--text-faint]">Previous</span>
+            <span className="block font-mono text-sm text-[--text] group-hover:text-[--accent-light] transition-colors">{prev.title}</span>
+          </span>
         </a>
       ) : (
         <div />
@@ -124,10 +114,13 @@ function PrevNext({ current }: { current: string }) {
       {next ? (
         <a
           href={`/docs/${next.slug}`}
-          className="flex items-center gap-2 text-sm text-[--text-muted] hover:text-[--accent-light] transition-colors"
+          className="group flex items-center gap-3 rounded-xl border border-bg-border bg-bg-surface/40 px-4 py-3 text-right transition-all hover:border-[color-mix(in_srgb,var(--accent)_45%,transparent)] hover:bg-bg-elevated/60 hover:-translate-y-0.5"
         >
-          <span className="font-mono">{next.title}</span>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <span className="text-right">
+            <span className="block text-[10px] uppercase tracking-widest text-[--text-faint]">Next</span>
+            <span className="block font-mono text-sm text-[--text] group-hover:text-[--accent-light] transition-colors">{next.title}</span>
+          </span>
+          <svg width="15" height="15" viewBox="0 0 14 14" fill="none" className="text-[--text-muted] transition-transform group-hover:translate-x-0.5 group-hover:text-[--accent-light]">
             <path d="M5 2l4 5-4 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </a>

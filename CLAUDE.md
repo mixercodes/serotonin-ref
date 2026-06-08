@@ -10,15 +10,16 @@ Deployed to Vercel at `https://serotonin-ref.vercel.app`. The `master` branch au
 src/
   app/
     api/mcp/route.ts      — MCP HTTP endpoint (stateless, JSON-RPC)
-    docs/[...slug]/page.tsx — server component, renders one doc page
-    globals.css           — CSS custom properties for theming, prose styles
-    layout.tsx            — root layout: Sidebar + TopNav + Search
+    docs/[...slug]/page.tsx — server component, renders one doc page (wide, prev/next cards)
+    page.tsx              — client home: animated hero + MCP card + quick links
+    globals.css           — CSS custom properties (single scheme), prose styles, motion utils
+    layout.tsx            — root layout: Sidebar + Breadcrumbs + PageTransition + Search
   components/
     MarkdownContent.tsx   — client component: renders markdown, handles search scroll/highlight
     Search.tsx            — client component: Ctrl+K modal, per-heading index
-    Sidebar.tsx
-    TopNav.tsx
-    ThemeSelector.tsx
+    Sidebar.tsx           — compact nav; folds in search trigger, build label, footer links, mobile drawer
+    Breadcrumbs.tsx       — floating top-right breadcrumb trail (Framer Motion)
+    PageTransition.tsx    — Framer Motion route-change fade/slide, keyed on pathname
   content/                — markdown source files (one per page)
     libraries/*.md
     userdata/*.md
@@ -38,11 +39,13 @@ src/
 
 That's it — search index, sidebar, prev/next, and MCP `list_pages` all derive from `PAGES`.
 
-## Theming
+## Theming & motion
 
-Four themes: `default` (greyscale), `gruvbox`, `nord`, `catppuccin`. All colors are CSS custom properties (`--accent`, `--bg-base`, etc.) set on `[data-theme="..."]` in `globals.css`. Theme is persisted in `localStorage` and applied before first paint via an inline script in `layout.tsx` to avoid flash.
+Single curated scheme — deep slate canvas, violet primary (`--accent`), cyan secondary (`--accent-2`). All colors are CSS custom properties set on `:root` / `[data-theme="default"]` in `globals.css`. The old multi-theme switcher was removed; `data-theme="default"` is hardcoded on `<html>`.
 
-Never hardcode colors — always use CSS variables so new themes work automatically.
+Never hardcode colors — always use CSS variables (`--accent`, `--bg-base`, `--text`, …).
+
+Animation is **Framer Motion** plus a few CSS keyframes in `globals.css` (`float-in`, `pulse-dot`/`.live-dot`, `shimmer`, `.gradient-text`, `.grid-texture`, `.ambient-glow`). Route transitions live in `PageTransition.tsx`; the sidebar active pill uses a shared `layoutId="sidebar-active"`. Any component using `motion.*` must be a client component.
 
 ## Search
 

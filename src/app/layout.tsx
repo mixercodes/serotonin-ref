@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
-import BuildInfo from "@/components/BuildInfo";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import PageTransition from "@/components/PageTransition";
 import Search from "@/components/Search";
 import { buildSearchIndex } from "@/lib/search-data";
 
@@ -26,23 +27,25 @@ export const metadata: Metadata = {
   },
 };
 
-const themeScript = `(function(){var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t||'default');})();`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const searchIndex = buildSearchIndex();
 
+  const sha = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7);
+  const date = new Date().toISOString().slice(0, 10);
+  const buildLabel = sha ? `${sha} · ${date}` : "dev build";
+
   return (
-    <html lang="en" className="h-dvh overscroll-none">
+    <html lang="en" className="h-dvh overscroll-none" data-theme="default" data-scroll-behavior="smooth">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="flex h-dvh overflow-hidden overscroll-none bg-bg-base">
-        <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-          <BuildInfo />
-          {children}
+        <div className="ambient-glow" aria-hidden="true" />
+        <Sidebar buildLabel={buildLabel} />
+        <div className="relative flex-1 flex flex-col min-w-0 overflow-hidden">
+          <Breadcrumbs />
+          <PageTransition>{children}</PageTransition>
         </div>
         <Search index={searchIndex} />
       </body>
