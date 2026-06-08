@@ -2,6 +2,7 @@
 
 Direct access to the Roblox process address space. Read typed values, write them back, scan for byte patterns, and validate addresses before use. 6 functions.
 
+> [!CAUTION]
 > **`Write` is documented but not roundtrip-tested.** A wrong address or type can corrupt Roblox state. Gate every write with `IsValid` and a read-back sanity check.
 
 ## Supported types

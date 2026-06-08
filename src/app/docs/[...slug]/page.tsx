@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { PAGES } from "@/lib/pages";
 import { fetchPage } from "@/lib/fetcher";
 import MarkdownContent from "@/components/MarkdownContent";
+import DocBadges from "@/components/DocBadges";
 
 interface Props {
   params: Promise<{ slug: string[] }>;
@@ -74,9 +75,16 @@ export default async function DocPage({ params }: Props) {
 
   const content = stripFrontmatter(raw);
 
+  // Count member headings (## `name`) — a good proxy for function count.
+  const memberCount =
+    page.section === "library" || page.section === "userdata"
+      ? (content.match(/^##\s+`/gm) ?? []).length
+      : 0;
+
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-5xl mx-auto px-5 md:px-8 lg:px-12 pt-16 pb-16">
+        <DocBadges page={page} memberCount={memberCount || undefined} />
         <MarkdownContent content={content} />
 
         {/* Prev/Next nav */}

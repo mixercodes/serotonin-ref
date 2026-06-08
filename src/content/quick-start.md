@@ -16,6 +16,7 @@ Scripts register callbacks — there is no `while true` loop. Register with `che
 
 Both `paint` and `onPaint` dispatch to the same slot — registering both doubles the callback rate.
 
+> [!CAUTION]
 > **`cheat.register` cannot be called from inside `pcall`.** Raises `"Cannot register callback outside of a script's main execution block."` Register at the top level of your script only.
 
 ## Naming convention
@@ -41,6 +42,7 @@ Not available (return `nil` or error): `_G`, `_ENV`, `workspace`, `typeof`, `tic
 
 `coroutine` is fully available: `create`, `wrap`, `resume`, `yield`, `status`, `running`, `isyieldable`. `math`, `string`, and `table` are the full LuaJIT standard sets.
 
+> [!WARNING]
 > **`_G` does not exist in the sandbox.** Use bare globals: `_MY_FLAG = true`, not `_G._MY_FLAG = true`.
 
 ## Userdata vs table

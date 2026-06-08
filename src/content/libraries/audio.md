@@ -2,6 +2,7 @@
 
 Sound output: system beep, WAV playback, and a stop-all. 3 functions.
 
+> [!CAUTION]
 > **`PlaySound` crashes the cheat on non-WAV input.** The internal WAV loader does not validate the RIFF header before processing. Passing any non-WAV string — including an empty string or HTTP error page — triggers a native SEH exception that `pcall` cannot catch. Always verify bytes before passing to `PlaySound`.
 
 ---

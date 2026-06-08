@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { pagesBySection, type PageSection } from "@/lib/pages";
 import PageIcon from "./PageIcon";
+import BrandMark from "./BrandMark";
 
 const SECTION_LABELS: Record<PageSection, string> = {
   foundation: "Runtime",
@@ -39,17 +40,7 @@ function ChevronRight() {
 }
 
 function Logo() {
-  return (
-    <span className="relative w-7 h-7 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
-          style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }}>
-      <span className="absolute inset-0 opacity-40"
-            style={{ background: "radial-gradient(circle at 30% 25%, white, transparent 60%)" }} />
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="relative">
-        <circle cx="7" cy="7" r="3.3" fill="white" opacity="0.95" />
-        <circle cx="7" cy="7" r="6" stroke="white" strokeWidth="1.2" opacity="0.45" />
-      </svg>
-    </span>
-  );
+  return <BrandMark size={28} radius={8} />;
 }
 
 export default function Sidebar({ buildLabel }: { buildLabel?: string }) {

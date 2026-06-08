@@ -5,6 +5,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { pagesBySection } from "@/lib/pages";
 import PageIcon from "@/components/PageIcon";
+import BrandMark from "@/components/BrandMark";
 
 const MCP_JSON = `{
   "mcpServers": {
@@ -64,15 +65,8 @@ export default function Home() {
           animate="show"
           className="relative px-6 md:px-12 lg:px-16 pt-20 pb-16 max-w-5xl"
         >
-          <motion.div variants={fadeUp} className="flex items-center gap-2 mb-7">
-            <span className="relative w-8 h-8 rounded-xl flex items-center justify-center overflow-hidden"
-                  style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }}>
-              <span className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 30% 25%, white, transparent 60%)" }} />
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="relative">
-                <circle cx="8" cy="8" r="4" fill="white" opacity="0.95" />
-                <circle cx="8" cy="8" r="7" stroke="white" strokeWidth="1.4" opacity="0.4" />
-              </svg>
-            </span>
+          <motion.div variants={fadeUp} className="flex items-center gap-2.5 mb-7">
+            <BrandMark size={34} radius={10} />
             <span className="text-lg font-bold tracking-tight text-[--text-heading]">serotonin</span>
             <span className="text-[10px] font-mono bg-bg-elevated px-1.5 py-0.5 rounded border border-bg-border text-[--text-muted]">
               API Reference

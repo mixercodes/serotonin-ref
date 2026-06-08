@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeHighlight from "rehype-highlight";
+import rehypeCallouts from "@/lib/rehype-callouts";
 
 interface Props {
   content: string;
@@ -20,8 +21,9 @@ function applySearchHighlights(query: string): () => void {
   const marked: HTMLElement[] = [];
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
-      // Skip text inside code blocks (pre > code), allow inline code
-      if ((node as Text).parentElement?.closest("pre")) return NodeFilter.FILTER_REJECT;
+      const el = (node as Text).parentElement;
+      // Skip code blocks and the code-block chrome (lang label / copy button)
+      if (el?.closest("pre") || el?.closest(".code-block-header")) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
   });
@@ -58,6 +60,54 @@ function applySearchHighlights(query: string): () => void {
   };
 }
 
+/* ── Code block with language label + copy button ──────────────── */
+function CodeBlock({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) {
+  const ref = useRef<HTMLPreElement>(null);
+  const [copied, setCopied] = useState(false);
+
+  // language comes from the child <code class="language-xxx hljs">
+  let lang = "";
+  const child = Array.isArray(children) ? children[0] : children;
+  const cls = (child as any)?.props?.className as string | undefined;
+  const m = cls && /language-(\w+)/.exec(cls);
+  if (m) lang = m[1];
+
+  const copy = () => {
+    const text = ref.current?.innerText ?? "";
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <div className="code-block">
+      <div className="code-block-header">
+        <span className="code-lang">{lang || "code"}</span>
+        <button onClick={copy} className="code-copy" aria-label="Copy code">
+          {copied ? (
+            <><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.5 9 10 3" stroke="var(--accent-2)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>copied</>
+          ) : (
+            <><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="3" y="3" width="6.5" height="6.5" rx="1.2" stroke="currentColor" strokeWidth="1.2"/><path d="M2.5 7.5V2.5a1 1 0 011-1H7" stroke="currentColor" strokeWidth="1.2"/></svg>copy</>
+          )}
+        </button>
+      </div>
+      <pre ref={ref} {...props}>{children}</pre>
+    </div>
+  );
+}
+
+function Heading({ level, children, id, ...props }: { level: 2 | 3 | 4; id?: string; children?: React.ReactNode } & React.HTMLAttributes<HTMLHeadingElement>) {
+  const Tag = `h${level}` as "h2" | "h3" | "h4";
+  return (
+    <Tag id={id} {...props}>
+      {children}
+      {id && (
+        <a href={`#${id}`} className="heading-anchor" aria-label="Link to this section">#</a>
+      )}
+    </Tag>
+  );
+}
+
 export default function MarkdownContent({ content }: Props) {
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -66,8 +116,6 @@ export default function MarkdownContent({ content }: Props) {
 
     let cleanup: (() => void) | undefined;
 
-    // setTimeout yields past Next.js's own post-navigation scroll reset;
-    // rAF inside ensures the browser has painted the new content.
     const timer = setTimeout(() => {
       requestAnimationFrame(() => {
         cleanup = applySearchHighlights(query);
@@ -90,7 +138,13 @@ export default function MarkdownContent({ content }: Props) {
     <div className="prose prose-invert prose-sm md:prose-base max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSlug, rehypeHighlight]}
+        rehypePlugins={[rehypeSlug, rehypeCallouts, rehypeHighlight]}
+        components={{
+          pre: CodeBlock as any,
+          h2: (p) => <Heading level={2} {...(p as any)} />,
+          h3: (p) => <Heading level={3} {...(p as any)} />,
+          h4: (p) => <Heading level={4} {...(p as any)} />,
+        }}
       >
         {content}
       </ReactMarkdown>

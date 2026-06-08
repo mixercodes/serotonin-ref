@@ -15,11 +15,15 @@ src/
     globals.css           — CSS custom properties (single scheme), prose styles, motion utils
     layout.tsx            — root layout: Sidebar + Breadcrumbs + PageTransition + Search
   components/
-    MarkdownContent.tsx   — client component: renders markdown, handles search scroll/highlight
+    MarkdownContent.tsx   — client: renders markdown; code-copy blocks, heading anchors, search highlight
     Search.tsx            — client component: Ctrl+K modal, per-heading index
     Sidebar.tsx           — compact nav; folds in search trigger, build label, footer links, mobile drawer
     Breadcrumbs.tsx       — floating top-right breadcrumb trail (Framer Motion)
     PageTransition.tsx    — Framer Motion route-change fade/slide, keyed on pathname
+    BrandMark.tsx         — brain logo (serotonin.win motif) in theme gradient; used by sidebar + home
+    DocBadges.tsx         — rbxcli-style title badge row (section / usage / count / runtime-verified)
+  lib/
+    rehype-callouts.ts    — GitHub-style [!NOTE]/[!TIP]/[!WARNING]/[!CAUTION] admonitions
   content/                — markdown source files (one per page)
     libraries/*.md
     userdata/*.md
@@ -38,6 +42,12 @@ src/
 2. Create `src/content/<slug>.md`
 
 That's it — search index, sidebar, prev/next, and MCP `list_pages` all derive from `PAGES`.
+
+## Doc formatting (markdown authoring)
+
+- **Callouts:** start a blockquote with `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, or `[!CAUTION]` on the first line. `rehype-callouts.ts` strips the marker and applies a colored, labeled box. Unmarked blockquotes still render as a clean default callout. Convention: `[!CAUTION]` = crashes / state corruption, `[!WARNING]` = silent-failure gotchas, `[!NOTE]` = indexing/semantics notes.
+- **Code blocks** auto-get a language label + copy button (from the ```` ```lua ```` fence).
+- **Title badge row** (`DocBadges`) is derived from `PAGES` section + a `^## \`name\`` heading count — no per-page config.
 
 ## Theming & motion
 

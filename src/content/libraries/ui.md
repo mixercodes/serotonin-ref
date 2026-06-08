@@ -15,8 +15,10 @@ NewTab("MY_TAB", "My Script")
             └── NewHotkey(..., true)                  -- inline after checkbox
 ```
 
+> [!WARNING]
 > **Tab and container IDs must differ from their labels.** `ui.NewTab("Settings", "Settings")` renders the tab twice. Use a short opaque key as the ID and a human-readable string as the label: `ui.NewTab("myscript_tab", "My Script")`.
 
+> [!WARNING]
 > **No unregister API.** Widgets persist until the script unloads. Re-running a script without restarting stacks new callbacks on top. Guard with `_ALREADY_LOADED`.
 
 ## Value types by widget
@@ -34,6 +36,7 @@ NewTab("MY_TAB", "My Script")
 | `NewColorpicker` | `table {r, g, b, a}` (integers 0–255) | `table {r=, g=, b=, a=}` — **not** `Color3` |
 | `NewHotkey` | `bool` (true while bound key is held) | `number` (Windows VK code) |
 
+> [!NOTE]
 > **Dropdown `GetValue` and `SetValue` are 0-based.** `GetValue` returns `0` for the first option, `1` for the second, and so on. `SetValue` takes a 0-based index. **The `default` 5th argument to `NewDropdown` is 1-based**: pass `1` for the first item, `2` for the second; omit for the first item. Passing `0` results in `GetValue = -1` (undefined — avoid).
 
 ---

@@ -30,8 +30,10 @@ Every value returned by `GetPlayers`, `GetLocalPlayer`, and `GetTarget` is a pla
 | `IsWhitelisted` | `bool` | `true` if added via `game.PlayerWhitelist` |
 | `BoundingBox` | `table {x, y, w, h}` | screen-space pixel rectangle; **empty table `{}`** for teammates and dead players — always check `bb.w` exists before using |
 
+> [!WARNING]
 > **`Position` is stale.** In FFA and many competitive modes, `p.Position` stays at `(0,0,0)` for all living players. Use `p:GetBonePosition("HumanoidRootPart")` for live world position.
 
+> [!WARNING]
 > **`IsVisible` requires a Visible Only check to be active.** With no Visible Only checks enabled in Serotonin (ESP, Aimbot, or Triggerbot), the field returns `false` for all players — wall checking is skipped as a performance optimization. Enable at least one for valid results.
 
 ## Bone accessors
@@ -45,8 +47,10 @@ Every value returned by `GetPlayers`, `GetLocalPlayer`, and `GetTarget` is a pla
 
 Bone names follow standard R15 convention: `HumanoidRootPart`, `Head`, `UpperTorso`, `LowerTorso`, `LeftUpperArm`, `RightUpperArm`, `LeftUpperLeg`, `RightUpperLeg`, etc. R6 uses `Torso`, `Left Arm`, etc.
 
+> [!WARNING]
 > **`GetBonePosition` can return `nil`.** Despite documentation stating it returns `Vector3(0,0,0)` for missing bones, it returns `nil` in production. Always guard: `local b = p:GetBonePosition(name); if not b then ... end`. A separate zero-vector check is still needed for bones that exist but have no valid position.
 
+> [!WARNING]
 > **Entity cache only covers enemies.** `p:GetBonePosition()` and `p.BoundingBox` return zero/empty for teammates even when they are alive. For teammate positions, fall back to workspace: `game.Workspace:FindFirstChild(p.Name):FindFirstChild("HumanoidRootPart").Position`.
 
 ---

@@ -2,6 +2,7 @@
 
 Entry point to the Roblox DataModel and a small set of cheat-side utilities. The `game` object is a **Lua table proxy** — not a Roblox Instance — so all methods use dot syntax, not colon.
 
+> [!WARNING]
 > **Always use dot syntax.** `game.GetService("Players")` works. `game:GetService("Players")` fails with a Lua error because there is no self argument to pass.
 
 ## Pre-resolved fields
