@@ -47,7 +47,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export default function Home() {
-  const { library, foundation, tool, userdata } = pagesBySection();
+  const { library, foundation, tool, userdata, roblox } = pagesBySection();
 
   return (
     <main className="relative flex-1 overflow-y-auto min-h-0">
@@ -161,7 +161,7 @@ export default function Home() {
         viewport={{ once: true, margin: "-60px" }}
         className="px-6 md:px-12 lg:px-16 py-10"
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-7xl">
           <LinkColumn title="Runtime">
             {[...foundation, ...tool].map((p) => <QuickLink key={p.slug} slug={p.slug} title={p.title} accent="var(--accent)" />)}
           </LinkColumn>
@@ -170,6 +170,9 @@ export default function Home() {
           </LinkColumn>
           <LinkColumn title="Userdata">
             {userdata.map((p) => <QuickLink key={p.slug} slug={p.slug} title={p.title} accent="var(--accent-2)" />)}
+          </LinkColumn>
+          <LinkColumn title="Roblox internals">
+            {roblox.map((p) => <QuickLink key={p.slug} slug={p.slug} title={p.title} accent="var(--accent)" />)}
           </LinkColumn>
         </div>
       </motion.section>

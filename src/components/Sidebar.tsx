@@ -12,15 +12,17 @@ const SECTION_LABELS: Record<PageSection, string> = {
   foundation: "Runtime",
   library: "Libraries",
   userdata: "Userdata",
+  roblox: "Roblox",
   tool: "Tools",
 };
 
-const SECTION_ORDER: PageSection[] = ["foundation", "library", "userdata", "tool"];
+const SECTION_ORDER: PageSection[] = ["foundation", "library", "userdata", "roblox", "tool"];
 
 const SECTION_ACCENT: Record<PageSection, string> = {
   foundation: "text-[--accent]",
   library: "text-[--text-muted]",
   userdata: "text-[--accent-2]",
+  roblox: "text-[--accent]",
   tool: "text-[--accent-light]",
 };
 

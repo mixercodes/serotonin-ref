@@ -175,3 +175,14 @@ end
 local raw = memory.Read("byte", addr)
 local signed = bit.arshift(bit.lshift(raw, 24), 24)
 ```
+
+## Hidden-property reads
+
+The sandbox hides several render-critical instance properties (`Material`, `Shape`, decal/mesh content ids, `SurfaceAppearance.ColorMap`). All are recoverable with typed reads at `instance.Address + offset`:
+
+- `instance.Address` is the real engine instance pointer (verified equal to `Part:GetPartAddress()`).
+- Offsets are **build-dependent** — resolve them at script load from the saveinstance `version-*.json` in the [`file`](/docs/libraries/file) sandbox root, never hardcode.
+- Guard every read with `pcall`, and `memory.IsValid(ptr)` before following any pointer.
+- `string` reads return content URLs; `vector3` reads return `Vector3` userdata — both verified working at instance offsets.
+
+The full property catalog, json parsing pattern, and validation discipline live on [hidden properties](/docs/roblox/hidden-properties).

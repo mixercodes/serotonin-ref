@@ -316,3 +316,37 @@ npm run build
 ```
 
 After editing `agent.lua`: reload it in Serotonin's Scripting tab. No server restart needed.
+
+## Executing scripts through eval
+
+`cheat.register` raises *"Cannot register callback outside of a script's main execution block."* when called from `eval`/`loadstring` contexts — even directly, outside any `pcall`. To run a callback-driven script through the agent, stub-capture the registrations and drive them manually:
+
+```lua
+local src = file.read("C:/Serotonin/scripts/myscript.lua")
+local cbs = {}
+local orig = cheat.register
+cheat.register = function(ev, fn) cbs[ev] = fn end
+local f, err = loadstring(src)
+if not f then cheat.register = orig; return err end
+f()
+cheat.register = orig
+_TESTCBS = cbs                      -- bare global: persists across eval chunks (_G is nil)
+for i = 1, 40 do cbs.onUpdate() end -- drive the captured callback manually
+```
+
+Two things make this workable:
+
+- **Bare globals persist across eval chunks** — stash captured callbacks in one and keep driving them from later evals.
+- **There is no `cheat.Unregister`** — really-registered callbacks can never be removed. Scripts that may be re-run should use a generation guard so a new load supersedes the old one:
+
+```lua
+_MYSCRIPT_GEN = (_MYSCRIPT_GEN or 0) + 1
+local MY_GEN = _MYSCRIPT_GEN
+cheat.register("onUpdate", function()
+    if _MYSCRIPT_GEN ~= MY_GEN then return end  -- superseded: no-op forever
+    -- ...
+end)
+```
+
+> [!WARNING]
+> Running a guard-aware script through eval bumps its generation global — any previously loaded real instance deactivates and stays dead until the script is reloaded from the Scripting tab. Instances loaded before the guard existed keep running until Roblox restarts.

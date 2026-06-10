@@ -14,6 +14,7 @@ const SECTION_BADGE: Record<PageSection, string> = {
   foundation: "runtime",
   library:    "lib",
   userdata:   "ud",
+  roblox:     "rbx",
   tool:       "tool",
 };
 

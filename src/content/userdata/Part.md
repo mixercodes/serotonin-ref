@@ -4,9 +4,9 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 
 **Not the same as a Roblox Instance.** The `:GetPart*` methods below exist only on this userdata. A Workspace `BasePart` obtained from `game.Workspace:FindFirstChild(...)` does not have them.
 
-**`entity.GetParts()` is often empty.** Many games return `0` parts. Always check `entity.GetPartsCount() > 0` before iterating. For a workspace-bound `BasePart`, use `draw.GetPartCorners(inst)` instead.
+**`entity.GetParts()` is often empty.** Many games return `0` parts. Always check `entity.GetPartsCount() > 0` before iterating. For a workspace-bound `BasePart`, use `draw.GetPartCorners(inst)` instead — its corner ordering is canonical and fully proven (`corners[1]`/`corners[8]` diagonally opposite, the three edges leaving corner 1 are the local axes scaled by `Size`); see [`draw.GetPartCorners`](/docs/libraries/draw#getpartcorners) for the full convention.
 
-**Cache lifetime.** The userdata is only valid for the current frame. Do not store across frames.
+**Cache lifetime.** The userdata is only valid for the current frame. Do not store across frames. To track a part across frames, store `:GetPartAddress()` — the engine pointer is stable while the instance lives, where the userdata is not.
 
 ## Methods
 
@@ -28,6 +28,16 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 | `:GetPartPrimitive()` | `number` — raw Primitive struct address |
 | `:GetPartClassName()` | `string` — Roblox ClassName |
 
+**`:GetPartAddress()` is the real engine instance pointer.** Verified: `part:GetPartAddress() == part:GetPartInstance().Address` for the same part. Two uses:
+
+- **Stable unique id** — track a part across frames (the userdata itself is frame-scoped; the address is not).
+- **Base address for `memory.Read`** of sandbox-hidden properties (`Shape`, `Material`, decal/mesh ids, …) — see [hidden properties](/docs/roblox/hidden-properties).
+
+**`:GetPartPrimitive()` is the engine's Primitive pointer.** Verified equal to the pointer read at the instance's BasePart `Primitive` offset via `memory.Read`. Primitive-relative properties (e.g. `Material`, a ushort) hang off this value — guard with `memory.IsValid` before dereferencing.
+
+> [!NOTE]
+> Offsets shift across Roblox engine updates — resolve them from the saveinstance version json at load instead of hardcoding. Technique and property catalog in [hidden properties](/docs/roblox/hidden-properties).
+
 ### Visual
 
 | Method | Returns |
@@ -40,6 +50,15 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 
 > [!WARNING]
 > **No built-in screen-projection or distance methods in the current build.** `:GetPartScreenPosition()` and `:GetPartDistance()` are **not bound** on the Part userdata — both index to `nil` and raise *"attempt to call method … (a nil value)"*. Project manually by feeding `:GetPartInstance().Position` (a real `Vector3`) into `utility.WorldToScreen`, and compute camera distance as `(part:GetPartInstance().Position - game.CameraPosition).Magnitude`.
+
+## The underlying Instance
+
+`:GetPartInstance()` returns a live Roblox `Instance`, subject to the usual sandbox holes:
+
+- **`.CFrame` and `.Orientation` are `nil`** — on all parts, workspace statics and the local player's character included. For rotation, use `:GetPartRotation()` (flat 9-element matrix) on this userdata, or `draw.GetPartCorners(inst)` on any workspace part.
+- **`.Shape` is `nil`** on `Part` instances. The `Enum.PartType` byte is readable via memory at the BasePart `Shape` offset — technique in [hidden properties](/docs/roblox/hidden-properties), enum values and Ball/Cylinder render semantics in [part shapes](/docs/roblox/part-shapes).
+- **`.Material` reads `"Unknown"`** — readable at the Primitive (see `:GetPartPrimitive()` above).
+- `.Position`, `.Size`, and `.Color` work — `.Color`'s `.R/.G/.B` are 0–255 integers.
 
 ---
 

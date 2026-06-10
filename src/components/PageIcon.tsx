@@ -136,6 +136,17 @@ export default function PageIcon({ slug, size }: { slug: string; size: number })
       <path d="M6 3.5V2M4.5 2H7.5" stroke={s} strokeWidth="1.2" strokeLinecap="round"/>
     </>);
 
+    /* -- Roblox engine internals: shared cube icon ------------------ */
+    case "roblox/hidden-properties":
+    case "roblox/part-shapes":
+    case "roblox/classic-meshes":
+    case "roblox/mesh-formats":
+    case "roblox/surfaces-decals":
+    case "roblox/character-rigs": return w(<>
+      <path d="M6 1.5L10.5 4v4L6 10.5L1.5 8V4L6 1.5Z" stroke={s} strokeWidth="1.2" strokeLinejoin="round"/>
+      <path d="M6 6L10.5 4M6 6L1.5 4M6 6V10.5" stroke={s} strokeWidth="1" strokeLinejoin="round"/>
+    </>);
+
     default: return w(
       <circle cx="6" cy="6" r="2" stroke={s} strokeWidth="1.2"/>
     );

@@ -27,6 +27,7 @@ src/
   content/                — markdown source files (one per page)
     libraries/*.md
     userdata/*.md
+    roblox/*.md           — engine-internals domain knowledge (shapes, meshes, decals, rigs, hidden properties)
     tools/*.md
     quick-start.md  pitfalls.md  audit-notes.md  mcp-ai-setup.md
   lib/
@@ -48,6 +49,8 @@ That's it — search index, sidebar, prev/next, and MCP `list_pages` all derive 
 - **Callouts:** start a blockquote with `> [!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, or `[!CAUTION]` on the first line. `rehype-callouts.ts` strips the marker and applies a colored, labeled box. Unmarked blockquotes still render as a clean default callout. Convention: `[!CAUTION]` = crashes / state corruption, `[!WARNING]` = silent-failure gotchas, `[!NOTE]` = indexing/semantics notes.
 - **Code blocks** auto-get a language label + copy button (from the ```` ```lua ```` fence).
 - **Title badge row** (`DocBadges`) is derived from `PAGES` section + a `^## \`name\`` heading count — no per-page config.
+- **No numeric memory offsets in content.** Offsets shift every Roblox engine update; docs reference the `version-*.json` class/property keys (e.g. BasePart → `Shape`) and link to `roblox/hidden-properties` for the parsing pattern. Same for build hashes — never cite a specific build.
+- **Roblox pages end with an "Official references" section** linking the authoritative create.roblox.com / devforum pages for the topic.
 
 ## Theming & motion
 

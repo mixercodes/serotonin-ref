@@ -24,7 +24,14 @@ Calls that trigger native SEH exceptions inside the Serotonin DLL. `pcall` does 
 
 | Call | Behaviour |
 |---|---|
-| `_G` | Does not exist in the sandbox — `type(_G)` returns `"nil"`. Use bare globals or `getfenv(1)` |
+| `_G` | Does not exist in the sandbox — `type(_G)` returns `"nil"`. Use bare globals or `getfenv(1)`; bare globals persist across `eval`/`loadstring` chunks |
+| `cheat.register` from `eval`/`loadstring` contexts | Raises *"Cannot register callback outside of a script's main execution block."* even when called directly. Workaround: stub-capture — see [Agent](/docs/tools/agent) |
+| No `cheat.Unregister` | Callbacks can never be removed. Use a generation guard: `_GEN = (_GEN or 0) + 1` at load, capture it, and have every callback no-op when superseded |
+| `inst:GetAttributes()` | Returns an **array** of `{Name, TypeName, Value}` tables, not the standard flat dict — iterate and match `attr.Name` |
+| `p:GetBonePosition(bone)` | Can return **nil** (not just the documented zero-vector) — guard before indexing `.X` |
+| `MeshPart.TextureId` | Often stale or empty when a `SurfaceAppearance` child exists — the engine renders the SurfaceAppearance ColorMap instead. See [surfaces & decals](/docs/roblox/surfaces-decals) |
+| Negative `SpecialMesh.Scale` components | Legitimate (mirrored meshes, inside-out skydomes) — clamp magnitude only, never the sign. See [classic meshes](/docs/roblox/classic-meshes) |
+| Exporting v1 `.mesh` assets | v1.00 vertices are stored doubled and v1.00/1.01 store V upside down — see [mesh formats](/docs/roblox/mesh-formats) |
 | `game.DataModel` | Returns userdata |
 | `game.LocalPlayer.Backpack` | Accessible |
 | `game.PlaceID` | Returns the place ID |

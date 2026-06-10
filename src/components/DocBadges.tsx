@@ -4,6 +4,7 @@ const SECTION_META: Record<PageSection, { label: string; color: string }> = {
   library:    { label: "library",  color: "#58a6ff" },
   userdata:   { label: "userdata", color: "#39c5cf" },
   foundation: { label: "guide",    color: "#3fb950" },
+  roblox:     { label: "roblox",   color: "#58a6ff" },
   tool:       { label: "tool",     color: "#ffa657" },
 };
 

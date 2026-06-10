@@ -142,3 +142,13 @@ Workflow: list_functions(library) → lookup(fn) for any function you need.
 - websocket.Connect returns a numeric connection ID (sequential from 1)
 - http is HTTPS only — plain HTTP untested; callback fires on later tick, never synchronously
 ```
+
+## Pairing with official Roblox docs
+
+This reference covers the Serotonin runtime and the engine internals it interacts with — it does not duplicate Roblox's own API documentation. For engine-level questions outside these pages, point your assistant at:
+
+- **[create.roblox.com/docs](https://create.roblox.com/docs)** — the official creator documentation (classes, enums, datatypes). Directly fetchable by AI assistants; enum pages carry exact numeric values.
+- **[Roblox/creator-docs](https://github.com/Roblox/creator-docs)** — the same content as raw YAML/markdown on GitHub, convenient for programmatic lookup.
+- **[devforum.roblox.com](https://devforum.roblox.com)** — release notes and behavior announcements (the Roblox pages here cite the relevant threads inline).
+
+There is no official Roblox documentation MCP server; the pages in the **Roblox** section embed the authoritative links per topic instead, so `read_page` results carry them to the assistant.

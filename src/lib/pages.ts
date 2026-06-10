@@ -1,4 +1,4 @@
-export type PageSection = "foundation" | "library" | "userdata" | "tool";
+export type PageSection = "foundation" | "library" | "userdata" | "roblox" | "tool";
 
 export interface DocPage {
   slug: string;
@@ -33,6 +33,13 @@ export const PAGES: DocPage[] = [
   { slug: "userdata/Instance", title: "Instance", section: "userdata" },
   { slug: "userdata/Part", title: "Part", section: "userdata" },
   { slug: "userdata/Player", title: "Player", section: "userdata" },
+  // Roblox engine internals (runtime-verified domain knowledge)
+  { slug: "roblox/hidden-properties", title: "Hidden properties", section: "roblox" },
+  { slug: "roblox/part-shapes", title: "Part shapes", section: "roblox" },
+  { slug: "roblox/classic-meshes", title: "Classic meshes", section: "roblox" },
+  { slug: "roblox/mesh-formats", title: "Mesh file formats", section: "roblox" },
+  { slug: "roblox/surfaces-decals", title: "Surfaces & decals", section: "roblox" },
+  { slug: "roblox/character-rigs", title: "Character rigs", section: "roblox" },
   // Tools
   { slug: "tools/agent", title: "Agent", section: "tool" },
 ];
@@ -42,6 +49,7 @@ export function pagesBySection(): Record<PageSection, DocPage[]> {
     foundation: [],
     library: [],
     userdata: [],
+    roblox: [],
     tool: [],
   };
   for (const p of PAGES) out[p.section].push(p);

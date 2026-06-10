@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Primitives** | 13 (must be called inside `onPaint`) |
-| **Utilities** | 5 (`GetScreenSize`, `GetTextSize`, `ComputeConvexHull`, `GetPartCorners`, `GetMesh` — callable anywhere) |
+| **Utilities** | 5 (`GetScreenSize`, `GetTextSize`, `ComputeConvexHull`, `GetPartCorners` — callable anywhere; `GetMesh` is `onPaint`-only) |
 | **Aliases** | two-form for single-word verbs (`Line`/`line`), three-form for multi-word names (`RectFilled`/`rectFilled`/`rect_filled`) |
 
 ## onPaint requirement
@@ -15,7 +15,7 @@
 The following utility functions are safe to call anywhere:
 `GetTextSize`, `GetScreenSize`, `GetPartCorners`, `ComputeConvexHull`
 
-`GetMesh` exists but returns `nil` outside `onPaint` and may crash with certain instance types — treat as `onPaint`-only.
+`GetMesh` exists but returns `nil` outside `onPaint` and crashes for non-`MeshPart` instances — treat as `onPaint`-only.
 
 ## Known crash triggers
 
@@ -296,15 +296,42 @@ end
 
 So `u = corners[2]-corners[1]`, `v = corners[3]-corners[1]`, `w = corners[5]-corners[1]` give the full oriented box (normalize for the rotation basis, take lengths for `Size`). Useful for exporting world geometry or building an oriented box mesh externally.
 
+**The axes carry exact signs, not just directions.** `u` is the part's local **+X** — not merely parallel to the X axis — `v` is **+Y**, `w` is **+Z**. Verified against the local player's `HumanoidRootPart` using body asymmetry: `u · (RightArm − LeftArm)` = +0.995 (`u` = body right = +X), `v · worldUp` = +1.000, and `w · forward` = −0.995 where `forward = Up × Right` — characters face local −Z, so `w` is exactly +Z.
+
+**The basis is right-handed for every part.** `dot(cross(u, v), w) > 0` held for all 777 parts of a live map (`Part`, `WedgePart`, `CornerWedgePart`, `MeshPart`, `UnionOperation`) at arbitrary rotations.
+
+**The ordering is canonical (part-local), not world-dependent.** Tracking turning players' HRPs sampled every ~120 ms showed `u` rotating continuously with zero sign flips through a 71° cumulative turn. Edge lengths matched (`Size.X`, `Size.Y`, `Size.Z`) per axis for all 121 wedges of a live map at arbitrary roll/pitch/yaw.
+
+Because the signs are exact and stable, you can place **asymmetric** geometry exactly — not just the bounding box. Any part-local point `(a, b, c)` with each component in `[-0.5, 0.5]` maps to world space as `center + u*a + v*b + w*c`:
+
+```lua
+local corners = draw.GetPartCorners(part)
+local c1     = corners[1]
+local u      = corners[2] - c1            -- local +X * Size.X
+local v      = corners[3] - c1            -- local +Y * Size.Y
+local w      = corners[5] - c1            -- local +Z * Size.Z
+local center = (c1 + corners[8]) / 2      -- == part.Position
+
+-- world position of part-local point (a, b, c), each in [-0.5, 0.5]
+local function local_to_world(a, b, c)
+    return center + u * a + v * b + w * c
+end
+```
+
+This is enough to reconstruct wedge slopes, corner-wedge apexes, and decal faces at their exact world positions — see [part shapes](/docs/roblox/part-shapes) for the local-space vertex sets of each `PartType`, and [surfaces & decals](/docs/roblox/surfaces-decals) for which local axis each `NormalId` face sits on.
+
 ---
 
 ## `GetMesh`
 
 ```lua
-draw.GetMesh(part: Instance) → ?
+draw.GetMesh(meshPart: Instance) → ?
 ```
 
-Returns mesh data for a `MeshPart`. Passing a regular `Part` or `nil` raises `"An unknown C++ exception occurred."` — the specific message does **not** include type information. In practice returns `nil` outside of `onPaint`; treat as `onPaint`-only.
+Returns mesh data for a `MeshPart` — **`MeshPart` only**, and **`onPaint`-only**: outside `onPaint` it returns `nil` even for a valid `MeshPart`.
+
+> [!CAUTION]
+> Passing anything other than a `MeshPart` (a plain `Part`, any other class, or `nil`) raises `"An unknown C++ exception occurred."` — the message carries no type or argument information, so the failure is hard to trace back to this call. Check `inst.ClassName == "MeshPart"` before calling (not `:IsA` — superclass checks are broken in the sandbox), and wrap in `pcall`.
 
 ---
 
