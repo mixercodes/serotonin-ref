@@ -26,12 +26,22 @@ This page covers the **mechanism** — how to find the offsets at runtime, how t
 
 ## Resolving the offsets
 
-Offsets shift with every Roblox engine update — they are *offsets*, not constants — so a script must never hardcode them or read them from a dump file that can fall out of sync. **Derive them at runtime from live instances**, each by an independent signature, and validate before use. The whole class layout shifts as a unit between builds, but each field still has a recognisable fingerprint in memory:
+Offsets shift with every Roblox engine update — they are *offsets*, not constants — so a script must never hardcode them or read them from a dump file that can fall out of sync. **Derive them at runtime from live instances** and validate before use. The working pattern is two-tier: pin each class to an **anchor** found by a signature that cannot false-match, then place the class's remaining fields from their last-known **relative layout** (deltas from the anchor) — validating every one against the live samples and dropping any that fails. A whole-struct shift (the common case between builds) moves the anchor and keeps the deltas valid; an intra-class reorder fails validation and falls back to an anchored window scan.
 
-- **Asset-string fields** (`Decal.ColorMapContent`, `SpecialMesh.MeshId` / `TextureId`, `SurfaceAppearance.ColorMap`): the offset that holds a content-URL string (a run of 5+ digits) across most sampled instances. Distinctive enough that a handful of agreeing samples pin it.
+Anchor signatures that hold up live:
+
+- **Asset-string fields** (`Decal.ColorMapContent`, `SpecialMesh.MeshId`, `SurfaceAppearance.ColorMap`): the offset that holds a content-URL string (a run of 5+ digits) across most sampled instances. Distinctive enough that a handful of agreeing samples pin it.
 - **Primitive + Material**: the unique `(pointer offset, ushort offset)` pair whose dereferenced value lands in the Enum.Material value set for *every* sampled part. Enum membership is selective, so exactly one pair survives.
-- **Shape**: anchor on `Color3` — the only one of these the sandbox exposes as ground truth (`part.Color`) — by matching its byte triple in memory, then take the Enum.PartType byte that sits just past it.
-- **Value-domain fields with no ground truth** (`Decal.Face`, `SpecialMesh.MeshType`, `Scale`/`Offset`): search a window anchored to an already-derived offset for the one field whose value domain fits (`Face` an int in `0..5`, `MeshType` a byte in `0..11`, `Scale`/`Offset` a finite `vector3`) and accept it only if exactly one candidate qualifies.
+- **Color3 → Shape**: `part.Color` is the one sandbox-exposed ground truth — match its byte triple in memory, then find Shape past it as the byte in `0..4` whose **modal value is Block (1)** across a spread sample. The mode test is load-bearing: a neighbouring surface byte also sits in `0..4` and *varies* (Studs-modal on classic maps), so a uniqueness-by-variance rule picks the wrong byte on all-Block maps. With the mode rule, an all-Block map leaves Shape unresolved — correctly, since there is nothing to detect.
+- **DataModelMesh `Offset` + `Scale`**: two adjacent `vector3` fields — Offset first (modally `(0,0,0)`, its default), Scale 12 bytes later (modally nonzero). Score candidates by how many samples read all-zero in the first field; runs of zeros and ones overlap (`VertexColor` is another all-ones vec3 right after Scale), and only the true pair has Offset zero on most samples. This anchors the mesh family without any asset string, so geometric-mesh-only maps still resolve.
+
+Fields with no usable signature of their own (`Decal.Face`, `Decal.Transparency`, `Texture.StudsPerTileU/V`, `SpecialMesh.MeshType`/`MeshId`/`TextureId`) ride the layout deltas, each validated by value-domain across the samples before acceptance. Searching a window for these instead is under-determined in practice: a 25-offset window gets 25 chances to false-match (an all-opaque map makes *every* zero float a plausible Transparency), where a single validated hypothesis gets one.
+
+Three scan disciplines, all learned the hard way:
+
+- **Align the scan to the field size.** A window stepping `lo, hi, 4` from a misaligned base never lands on a 4-aligned field — it silently finds nothing and looks like bad samples.
+- **Accept by quorum, not all-must-pass.** One stale sample (instance streamed out, address reused) or one mid-animation value (games tween `Scale` through zero to hide meshes) must not veto the true offset. ~85% agreement works; for the vec3 pair, require nonzero Scale only on a majority.
+- **Pool classes that share a struct, split where they diverge.** `Decal` and `Texture` share the layout for the anchor and Face/Transparency, but tiling floats exist only on `Texture` — validating them against a pooled sample can never pass.
 
 Run the resolve a few times as the place streams in, then lock it for the session. Leave any field that can't be pinned unresolved and skip its read — **derive-or-disable**: a missing offset emits nothing, where a wrong one would emit garbage.
 
