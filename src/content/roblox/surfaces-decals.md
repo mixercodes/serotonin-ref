@@ -31,13 +31,13 @@ Classic `SpecialMesh` gear stores its texture on the mesh modifier (`SpecialMesh
 
 ## Reading the data from the sandbox
 
-`Decal.Texture` is `nil` in the sandbox, for `Texture` instances too. The data is readable via `memory.Read` at `instance.Address + offset`, using the `Decal` section's `ColorMapContent` (`string` — the texture content URL) and `Face` (`int` — NormalId 0–5) offsets from the version json. The same layout applies to `Texture` instances.
+`Decal.Texture` is `nil` in the sandbox, for `Texture` instances too. The data is readable via `memory.Read` at `instance.Address + offset`, using the Decal `ColorMapContent` (`string` — the texture content URL) and `Face` (`int` — NormalId 0–5) offsets, resolved at runtime ([hidden properties](/docs/roblox/hidden-properties)). The same layout applies to `Texture` instances.
 
 > [!WARNING]
-> **Offsets change across Roblox engine updates** — parse them at script load from the saveinstance `version-*.json`; never hardcode. See [hidden properties](/docs/roblox/hidden-properties) for the parsing pattern and the full validation discipline.
+> **Offsets change across Roblox engine updates** — resolve them at runtime by signature; never hardcode. See [hidden properties](/docs/roblox/hidden-properties) for the resolver and the full validation discipline.
 
 ```lua
-local OFF = { decal_content = ..., decal_face = ... }  -- parsed from the version json
+local OFF = { decal_content = ..., decal_face = ... }  -- resolved at runtime; see hidden properties
 
 local function read_decal(decal)
     local url, face
@@ -73,10 +73,10 @@ A `MeshPart` with a `SurfaceAppearance` child renders the SurfaceAppearance's **
 - **Stale `TextureId`** — retextured catalog gear commonly keeps an old, unrelated texture in `TextureId` while the real skin lives in the SurfaceAppearance. A `TextureId`-only reader shows the wrong skin.
 - **Empty `TextureId`** — [character limbs](/docs/roblox/character-rigs) commonly have an empty `TextureId` plus a real SurfaceAppearance ColorMap. A `TextureId`-only reader shows no texture at all.
 
-`SurfaceAppearance.ColorMap` is sandbox-invisible — read the `string` at the `SurfaceAppearance` section's `ColorMap` offset from the version json (same caveats as above):
+`SurfaceAppearance.ColorMap` is sandbox-invisible — read the `string` at the `SurfaceAppearance` `ColorMap` offset, resolved at runtime as in [hidden properties](/docs/roblox/hidden-properties) (same caveats as above):
 
 ```lua
-local OFF_SA_COLORMAP = ...  -- parsed from the version json
+local OFF_SA_COLORMAP = ...  -- resolved at runtime; see hidden properties
 
 -- Resolution order: SurfaceAppearance ColorMap first, TextureId as legacy fallback.
 local function mesh_texture(mesh_part)

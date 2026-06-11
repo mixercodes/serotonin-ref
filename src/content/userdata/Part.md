@@ -36,7 +36,7 @@ Userdata returned by `entity.GetParts()`. Pre-cached projection of a Roblox `Bas
 **`:GetPartPrimitive()` is the engine's Primitive pointer.** Verified equal to the pointer read at the instance's BasePart `Primitive` offset via `memory.Read`. Primitive-relative properties (e.g. `Material`, a ushort) hang off this value — guard with `memory.IsValid` before dereferencing.
 
 > [!NOTE]
-> Offsets shift across Roblox engine updates — resolve them from the saveinstance version json at load instead of hardcoding. Technique and property catalog in [hidden properties](/docs/roblox/hidden-properties).
+> Offsets shift across Roblox engine updates — resolve them at runtime by signature instead of hardcoding. Technique and property catalog in [hidden properties](/docs/roblox/hidden-properties).
 
 ### Visual
 

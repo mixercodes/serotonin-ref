@@ -2,7 +2,7 @@
 
 Serotonin's sandbox hides a set of render-critical properties: they read as `nil`, `""`, or a placeholder no matter what the instance actually holds. Every one of them is recoverable with a typed [`memory.Read`](/docs/libraries/memory) at a fixed offset from the instance's engine pointer.
 
-This page covers the **mechanism** — where the offsets come from, how to read them, and how to validate what comes back. What the recovered values *mean* lives on the semantic pages: [part shapes](/docs/roblox/part-shapes) (the Shape byte), [classic meshes](/docs/roblox/classic-meshes) (MeshType, Scale, Offset), and [surfaces & decals](/docs/roblox/surfaces-decals) (Face, decal compositing, SurfaceAppearance).
+This page covers the **mechanism** — how to find the offsets at runtime, how to read them, and how to validate what comes back. What the recovered values *mean* lives on the semantic pages: [part shapes](/docs/roblox/part-shapes) (the Shape byte), [classic meshes](/docs/roblox/classic-meshes) (MeshType, Scale, Offset), and [surfaces & decals](/docs/roblox/surfaces-decals) (Face, decal compositing, SurfaceAppearance).
 
 ## What the sandbox hides
 
@@ -19,59 +19,49 @@ This page covers the **mechanism** — where the offsets come from, how to read 
 
 ## The instance pointer is real
 
-`instance.Address` is the real engine instance pointer — not a handle or a hash. Verified two independent ways against the [`Part`](/docs/userdata/Part) userdata for the same part:
-
-- `inst.Address == entityPart:GetPartAddress()`
-- the Primitive pointer read at the BasePart `Primitive` offset equals `entityPart:GetPartPrimitive()`
-
-So `memory.Read(type, inst.Address + offset)` reads that instance's engine memory directly.
+`instance.Address` is the real engine instance pointer — not a handle or a hash. Cross-check it against the [`Part`](/docs/userdata/Part) userdata for the same part: `inst.Address == entityPart:GetPartAddress()`, and the Primitive pointer read at the BasePart `Primitive` offset equals `entityPart:GetPartPrimitive()`. So `memory.Read(type, inst.Address + offset)` reads that instance's engine memory directly.
 
 > [!NOTE]
-> Material is the one property in the table below that lives on the **Primitive struct**, not the instance. Read the Primitive pointer (BasePart `Primitive` offset) first, guard it with `memory.IsValid`, then read the `ushort` at the Primitive `Material` offset.
+> Material is the one property below that lives on the **Primitive struct**, not the instance. Read the Primitive pointer (BasePart `Primitive` offset) first, guard it with `memory.IsValid`, then read the `ushort` at the Primitive `Material` offset.
 
-## The offsets file: `version-*.json`
+## Resolving the offsets
 
-Offsets shift with every Roblox engine update, so this page deliberately lists **no numbers** — the saveinstance `version-<hash>.json` that lives in the Serotonin `files/` directory (the [`file`](/docs/libraries/file) sandbox root) documents per-class property offsets and is updated per engine release. Each property maps to an array whose first element is the offset, which is what the parse pattern below extracts.
+Offsets shift with every Roblox engine update — they are *offsets*, not constants — so a script must never hardcode them or read them from a dump file that can fall out of sync. **Derive them at runtime from live instances**, each by an independent signature, and validate before use. The whole class layout shifts as a unit between builds, but each field still has a recognisable fingerprint in memory:
 
-Parse it at script load and skip any read whose offset didn't resolve:
+- **Asset-string fields** (`Decal.ColorMapContent`, `SpecialMesh.MeshId` / `TextureId`, `SurfaceAppearance.ColorMap`): the offset that holds a content-URL string (a run of 5+ digits) across most sampled instances. Distinctive enough that a handful of agreeing samples pin it.
+- **Primitive + Material**: the unique `(pointer offset, ushort offset)` pair whose dereferenced value lands in the Enum.Material value set for *every* sampled part. Enum membership is selective, so exactly one pair survives.
+- **Shape**: anchor on `Color3` — the only one of these the sandbox exposes as ground truth (`part.Color`) — by matching its byte triple in memory, then take the Enum.PartType byte that sits just past it.
+- **Value-domain fields with no ground truth** (`Decal.Face`, `SpecialMesh.MeshType`, `Scale`/`Offset`): search a window anchored to an already-derived offset for the one field whose value domain fits (`Face` an int in `0..5`, `MeshType` a byte in `0..11`, `Scale`/`Offset` a finite `vector3`) and accept it only if exactly one candidate qualifies.
+
+Run the resolve a few times as the place streams in, then lock it for the session. Leave any field that can't be pinned unresolved and skip its read — **derive-or-disable**: a missing offset emits nothing, where a wrong one would emit garbage.
 
 ```lua
-local OFF = {}   -- filled from the version json; nil = don't attempt that read
+local OFF = {}        -- filled by the resolver; nil = don't attempt that read
+local GOT = {}        -- per-field gate: a feature reads memory only once its offset is confirmed
 
-local function load_offsets()
-    pcall(function()
-        local name
-        for _, e in ipairs(file.listdir("") or {}) do
-            if e.isFile and e.name:match("^version%-%x+%.json$") then name = e.name end
+-- Example signature: the offset holding an asset-id string across a sample of instances.
+local function asset_offset(addrs, lo, hi)
+    local best, best_hits = nil, 0
+    for off = lo, hi, 4 do
+        local hits = 0
+        for _, a in ipairs(addrs) do
+            local s = memory.Read("string", a + off)
+            -- type-check: an unmapped read returns a string sentinel, not nil (see warning below)
+            if type(s) == "string" and s:match("%d%d%d%d%d") then hits = hits + 1 end
         end
-        local raw = name and file.read(name)
-        if not raw then return end
-        local function sect(cls) return raw:match('"' .. cls .. '"%s*:%s*(%b{})') end
-        local function num(s, prop)
-            return s and tonumber(s:match('"' .. prop .. '"%s*:%s*%[%s*(%d+)')) or nil
-        end
-        local bp, dc, sm, sa = sect("BasePart"), sect("Decal"), sect("SpecialMesh"), sect("SurfaceAppearance")
-        OFF.primitive   = num(bp, "Primitive")
-        OFF.material    = num(bp, "Material")          -- Primitive-relative
-        OFF.shape       = num(bp, "Shape")
-        OFF.decal_tex   = num(dc, "ColorMapContent")
-        OFF.decal_face  = num(dc, "Face")
-        OFF.dmm_offset  = num(sm, "Offset")            -- DataModelMesh base: also CylinderMesh/BlockMesh
-        OFF.dmm_scale   = num(sm, "Scale")
-        OFF.mesh_id     = num(sm, "MeshId")
-        OFF.mesh_tex    = num(sm, "TextureId")
-        OFF.sa_colormap = num(sa, "ColorMap")
-    end)
+        if hits > best_hits then best_hits, best = hits, off end
+    end
+    if best_hits >= math.ceil(#addrs * 0.6) then return best end
+    return nil
 end
-
-load_offsets()
 ```
+
+> [!WARNING]
+> **`memory.Read` returns a string sentinel, not `nil`, on an unmapped or out-of-bounds read.** A signature scan steps across offsets that aren't always valid, so the result is truthy garbage. Indexing it (`.X` on a presumed `vector3`) or comparing it (`>=` on a presumed number) raises `bad argument #1 to '__index' (__vector3_meta expected, got string)` or an arithmetic-on-string error. **Type-check every speculative read** — `type(v) == "number"` / `"userdata"` / `"string"` — before using the value. Reads at a known-good offset don't hit this; scanning does.
 
 ## The property catalog
 
-Every entry below is runtime-verified (read live instances, checked the results against rendered geometry). Look the offset up in the json under the listed class/key.
-
-| Class (json section) | Property (json key) | Read type | Notes |
+| Class | Property | Read type | Notes |
 |---|---|---|---|
 | BasePart | Primitive | `pointer` | equals `GetPartPrimitive()`; guard with `memory.IsValid` |
 | BasePart | Material | `ushort` | **Primitive-relative**; Enum.Material value — validate against the known-values set |
@@ -82,28 +72,16 @@ Every entry below is runtime-verified (read live instances, checked the results 
 | SpecialMesh | Scale | `vector3` | same; negative components are legitimate (mirror trick) |
 | SpecialMesh | MeshId | `string` | `""` when the mesh is not a FileMesh |
 | SpecialMesh | TextureId | `string` | |
-| SpecialMesh | MeshType | `byte` | **not in the json** — empirical, see below |
+| SpecialMesh | MeshType | `byte` | Enum.MeshType `0..11` |
 | SurfaceAppearance | ColorMap | `string` | overrides `MeshPart.TextureId` in-engine — see [surfaces & decals](/docs/roblox/surfaces-decals) |
 
 Read types are the [`memory`](/docs/libraries/memory) type strings — `vector3` returns a `Vector3` userdata, `string` reads a NUL-terminated C string, `pointer` is an 8-byte address.
 
-## MeshType: the empirical exception
-
-The SpecialMesh `MeshType` byte is **not documented in the `version-*.json`**, so it has to be re-derived per build. The discovery check is mechanical:
-
-1. Collect SpecialMesh instances whose `MeshId` (memory read) contains a numeric asset id — those are FileMesh (`5`) by definition.
-2. Scan small instance-relative offsets (the low hundreds) for the one where **every** such instance reads `5`.
-3. Sanity-check a known typeless instance — a classic sphere skydome should read `3` (Sphere) at the same offset.
-
-In practice exactly one offset survives step 2.
-
-> [!WARNING]
-> Because it cannot be refreshed from the json, this offset has no automatic update path — re-run the discovery check after engine updates. Reads outside `0..11` are misreads — the value table and fallback semantics are on [classic meshes](/docs/roblox/classic-meshes).
-
 ## Validation discipline
 
-Memory reads can land on reparented or otherwise odd instances — a read that *succeeds* is not a read that is *correct*. Validate everything:
+Memory reads can land on reparented or otherwise odd instances, and a signature scan can mis-pin a field — a read that *succeeds* is not a read that is *correct*. Validate everything:
 
+- **Type-check every speculative read** (see the warning above) before any compare, arithmetic, or index.
 - **Wrap every read in `pcall`.** A bad address raises; never let one instance kill the scan.
 - **`memory.IsValid` before dereferencing any pointer.** The Primitive pointer especially — only follow it when `memory.IsValid(prim)` is true.
 - **Material: enum-set only.** Accept only values in the official Enum.Material value set. Anything outside the set is a misread, not a new material.
@@ -134,10 +112,11 @@ See [Instance](/docs/userdata/Instance) for the full attribute API.
 local VALID_MATERIAL = {}   -- keys: the official Enum.Material values, built once
 
 local function read_material(inst)
+    if not GOT.material then return nil end
     local mat
     pcall(function()
         local prim = memory.Read("pointer", inst.Address + OFF.primitive)
-        if memory.IsValid(prim) then
+        if type(prim) == "number" and memory.IsValid(prim) then
             mat = memory.Read("ushort", prim + OFF.material)
         end
     end)
@@ -150,6 +129,7 @@ end
 
 ```lua
 local function read_shape(part)   -- ClassName must be "Part"
+    if not GOT.shape then return 1 end
     local ok, b = pcall(memory.Read, "byte", part.Address + OFF.shape)
     if ok and type(b) == "number" and b >= 0 and b <= 4 then
         return b   -- Enum.PartType: 0 Ball, 1 Block, 2 Cylinder, 3 Wedge, 4 CornerWedge
@@ -162,12 +142,13 @@ end
 
 ```lua
 local function asset_id(url)
-    if not url or url == "" then return nil end
+    if type(url) ~= "string" or url == "" then return nil end
     if url:find("rbxasset://", 1, true) then return nil end   -- engine-local, skip
     return url:match("(%d+)%s*$")
 end
 
 local function read_decal_texture_id(decal)
+    if not GOT.decal_tex then return nil end
     local ok, url = pcall(memory.Read, "string", decal.Address + OFF.decal_tex)
     if not ok then return nil end
     return asset_id(url)
@@ -178,7 +159,7 @@ end
 
 ```lua
 local function valid_scale(v)
-    if not v then return false end
+    if type(v) ~= "userdata" then return false end   -- string sentinel on a bad read
     local cs = { v.X, v.Y, v.Z }
     for i = 1, 3 do
         local m = math.abs(cs[i])
@@ -188,6 +169,7 @@ local function valid_scale(v)
 end
 
 local function read_mesh_scale(mesh)
+    if not GOT.dmm_scale then return nil end
     local ok, v = pcall(memory.Read, "vector3", mesh.Address + OFF.dmm_scale)
     if ok and valid_scale(v) then return v end
     return nil

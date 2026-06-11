@@ -95,11 +95,11 @@ top view (apex marked A, at the +X / -Z corner)
 
 ## Reading Part.Shape in Serotonin
 
-`part.Shape` is `nil` in the sandbox. The shape is readable as a byte at a fixed offset from `part.Address` — see [hidden properties](/docs/roblox/hidden-properties) for the technique and how to resolve offsets from the `version-*.json` instead of hardcoding.
+`part.Shape` is `nil` in the sandbox. The shape is readable as a byte at a fixed offset from `part.Address` — see [hidden properties](/docs/roblox/hidden-properties) for the technique and how to resolve the offset at runtime instead of hardcoding.
 
 ```lua
--- Build-dependent: resolve from the version-*.json (BasePart -> "Shape") at load.
-local SHAPE_OFFSET = ...   -- see hidden properties for the parsing pattern
+-- Build-dependent: resolve at runtime (see hidden properties) — never hardcode.
+local SHAPE_OFFSET = ...   -- resolved by signature; see hidden properties
 
 local PART_TYPE = { [0] = "Ball", "Block", "Cylinder", "Wedge", "CornerWedge" }
 
@@ -130,8 +130,8 @@ Knowing the shape gives you geometry in part-local space; placing it in the worl
 
 - Enum values and the Ball/Cylinder min-diameter rule: official creator docs (API dump + YAML) and the June 2023 devforum announcement "Improvements to Part Shape & Size".
 - Wedge and CornerWedge vertex sets: EgoMoose's GJK collision vertex tables, the de facto community reference for exact part geometry.
-- The `GetPartCorners` basis (axis identity, signs, right-handedness) and the wedge bounding behaviour: runtime-verified through the Serotonin agent against a live map — 777 parts including 121 wedges at arbitrary roll/pitch/yaw, edge lengths matching `Size` per axis with zero sign flips while tracking rotating parts.
-- The Shape byte route: runtime-verified; offsets shift across Roblox updates — always resolve them from the [version json](/docs/roblox/hidden-properties).
+- The `GetPartCorners` basis (axis identity, signs, right-handedness) and the wedge bounding behaviour: confirmed against live maps — edge lengths match `Size` per axis with no sign flips, including wedges at arbitrary roll/pitch/yaw and while tracking rotating parts.
+- The Shape byte route: offsets shift across Roblox updates — always resolve them at runtime ([hidden properties](/docs/roblox/hidden-properties)).
 
 ## Official references
 

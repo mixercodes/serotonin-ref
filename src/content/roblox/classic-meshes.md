@@ -5,7 +5,7 @@
 This matters for anything that derives visuals from part boxes: a classic mesh can render far larger than its part (skydomes), displaced from it (`Offset`), or as a completely different shape. Part-box ESP and geometry exporters that ignore these children draw the wrong thing.
 
 > [!WARNING]
-> The sandbox hides every interesting property on these instances: `SpecialMesh.MeshId` reads `""`, and `Scale`, `Offset`, and `MeshType` are not exposed at all. Everything below must be read via `memory.Read` at `instance.Address + offset` — see [hidden properties](/docs/roblox/hidden-properties) for the offset table and the `version-*.json` loader. This page covers the *semantics* of what you read back.
+> The sandbox hides every interesting property on these instances: `SpecialMesh.MeshId` reads `""`, and `Scale`, `Offset`, and `MeshType` are not exposed at all. Everything below must be read via `memory.Read` at `instance.Address + offset` — see [hidden properties](/docs/roblox/hidden-properties) for the offset table and the runtime resolver. This page covers the *semantics* of what you read back.
 
 ## The DataModelMesh family
 
@@ -114,13 +114,13 @@ Both share `Scale` and `Offset` from `DataModelMesh` at the same memory offsets;
 
 ## Reading classic meshes in Serotonin
 
-All reads go through `memory.Read` at `mesh.Address + offset`. The offsets for `DataModelMesh.Offset`/`Scale` and `SpecialMesh.MeshId`/`TextureId` come from the saveinstance `version-*.json`; load them at script start as described in [hidden properties](/docs/roblox/hidden-properties).
+All reads go through `memory.Read` at `mesh.Address + offset`. The offsets for `DataModelMesh.Offset`/`Scale` and `SpecialMesh.MeshId`/`TextureId`/`MeshType` are resolved at runtime as described in [hidden properties](/docs/roblox/hidden-properties).
 
 > [!NOTE]
-> The `MeshType` offset is **not** in the version json — it was found empirically (every FileMesh instance reads 5 there; a sphere skydome read 3). It is build-dependent like the rest; re-verify after Roblox updates using known FileMesh instances.
+> `MeshType` is an `Enum.MeshType` byte (FileMesh is `5`, Sphere `3`). It is resolved by value-domain like the other fields ([hidden properties](/docs/roblox/hidden-properties)); reads outside `0..11` are misreads.
 
 ```lua
--- OFF.* loaded from the version-*.json — see /docs/roblox/hidden-properties
+-- OFF.* resolved at runtime — see /docs/roblox/hidden-properties
 local FILE_MESH = 5
 
 local function read_classic_mesh(mesh)
