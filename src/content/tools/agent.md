@@ -71,6 +71,9 @@ return entity.GetPlayers(true)[1].Name
 return cheat.GetWindowSize()
 ```
 
+> [!WARNING]
+> **Large numbers lose precision in eval results.** Results are serialized through JSON with limited float precision — instance `.Address` values (~2⁴¹) come back rounded, and two *different* instances can serialize to the **same** rounded address (runtime-verified: two distinct Decals both returned `2375470070000`). Never round-trip addresses or other large integers through eval output: do all `Address`-based work inside a single eval and return only small derived values (counts, offsets, short strings, booleans).
+
 ---
 
 ### `players`

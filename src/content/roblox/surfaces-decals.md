@@ -52,7 +52,7 @@ local function read_decal(decal)
 end
 ```
 
-Validation, per the [hidden properties](/docs/roblox/hidden-properties) discipline: accept only `Face` values in 0–5, extract asset ids with `match("(%d+)%s*$")`, and skip `rbxasset://` URLs — those are engine-local files, not fetchable. Downloading the image uses the same asset-delivery endpoint and place-context rules as meshes — see [mesh formats](/docs/roblox/mesh-formats).
+Validation, per the [hidden properties](/docs/roblox/hidden-properties) discipline: accept only `Face` values in 0–5, extract asset ids with `match("(%d+)%s*$")`, and skip `rbxasset://` URLs — those are engine-local files, not fetchable. The URL scheme varies with the place's era — `rbxassetid://<id>` on modern content, `http://www.roblox.com/asset/?id=<id>` on classic maps (runtime-verified live on a 2007-era place) — and the trailing-digits match covers all of them. Downloading the image uses the same asset-delivery endpoint and place-context rules as meshes — see [mesh formats](/docs/roblox/mesh-formats).
 
 ## Decal compositing
 
@@ -65,6 +65,11 @@ The engine draws the decal **over** the part's surface color:
 > **The black-RGB trap.** Decal images with transparent backgrounds typically carry **black RGB in their transparent texels**. A renderer that multiplies the texture with the part color — or samples RGB while ignoring alpha — shows those regions dark instead of showing the part color. External renderers must alpha-blend instead: `out = decal.rgb * decal.a + part.rgb * (1 - decal.a)`.
 
 This only matters when recreating the visual outside the engine (world exporters, radar viewers). In-engine, Roblox composites correctly on its own.
+
+Two more engine rules that trip external renderers:
+
+- **A fully transparent part still renders its decals at full visibility.** Part `Transparency = 1` hides the surfaces, not the face images — the classic floating-sign pattern is an invisible part carrying a Decal. A renderer that culls invisible parts must keep the ones with Decal/Texture children and draw just their face images.
+- **`Decal.Transparency` scales the whole image.** The decal's own Transparency (`0..1`, sandbox-hidden like its other properties) weakens every texel before compositing — a `0.7`-transparency decal reads as a 30%-strength overlay on the surface. At `≥ 0.99` the decal is invisible and safely droppable; partial values multiply into the texel alpha.
 
 ## SurfaceAppearance overrides MeshPart.TextureId
 

@@ -96,6 +96,9 @@ local magic = memory.Read("short", base)   -- 23117 = 0x5A4D = "MZ"
 local b1    = memory.Read("byte",  base)   -- 77 = 'M'
 ```
 
+> [!WARNING]
+> **An unmapped or out-of-bounds read returns a string sentinel, not `nil`.** The result is truthy garbage — indexing it as a userdata (`.X` on a presumed `vector3`) or comparing it as a number raises at the use site, not the read. When scanning addresses that aren't guaranteed valid (offset windows, speculative struct walks), type-check every result before use: `type(v) == "number"` / `"userdata"` / `"string"`. Reads at known-good offsets don't hit this; scanning does. See [hidden properties](/docs/roblox/hidden-properties) for the full scan discipline.
+
 ---
 
 ## `Write`

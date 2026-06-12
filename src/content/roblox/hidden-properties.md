@@ -37,13 +37,27 @@ Anchor signatures that hold up live:
 
 Fields with no usable signature of their own (`Decal.Face`, `Decal.Transparency`, `Texture.StudsPerTileU/V`, `SpecialMesh.MeshType`/`MeshId`/`TextureId`) ride the layout deltas, each validated by value-domain across the samples before acceptance. Searching a window for these instead is under-determined in practice: a 25-offset window gets 25 chances to false-match (an all-opaque map makes *every* zero float a plausible Transparency), where a single validated hypothesis gets one.
 
-Three scan disciplines, all learned the hard way:
+Four scan disciplines, all learned the hard way:
 
 - **Align the scan to the field size.** A window stepping `lo, hi, 4` from a misaligned base never lands on a 4-aligned field — it silently finds nothing and looks like bad samples.
 - **Accept by quorum, not all-must-pass.** One stale sample (instance streamed out, address reused) or one mid-animation value (games tween `Scale` through zero to hide meshes) must not veto the true offset. ~85% agreement works; for the vec3 pair, require nonzero Scale only on a majority.
 - **Pool classes that share a struct, split where they diverge.** `Decal` and `Texture` share the layout for the anchor and Face/Transparency, but tiling floats exist only on `Texture` — validating them against a pooled sample can never pass.
+- **Unit-range floats need a low-end witness.** "Every sample reads in `[0,1]`" is a weak signature — a junk field constant at exactly `1.0` passes it. For a transparency-like field, also demand at least one sample reading near zero (fully opaque instances exist on any real map) before accepting the offset. A false positive here is worse than no offset: downstream "skip invisible" logic then drops *every* instance as fully transparent.
 
-Run the resolve a few times as the place streams in, then lock it for the session. Leave any field that can't be pinned unresolved and skip its read — **derive-or-disable**: a missing offset emits nothing, where a wrong one would emit garbage.
+Leave any field that can't be pinned unresolved and skip its read — **derive-or-disable**: a missing offset emits nothing, where a wrong one would emit garbage.
+
+### Sample acquisition: don't starve
+
+How the resolver *gets* its samples matters as much as the signatures. The obvious design — a dedicated budget-capped workspace walk, re-run a few times while the place streams in, then locked for the session — fails silently on big maps: the walk can exhaust its node budget on every attempt without ever visiting a single instance of a class, the attempt budget runs out, and that family streams nothing for the rest of the session even though the class is right there. Runtime-measured failure: a place with 11 live Decals where a 5,000-node walk reached only 2 of them *after* the map had fully loaded — and none during the join window, when the attempts actually ran.
+
+Harvest samples from traversal work the script already does instead of relying only on a timed walk:
+
+- **Any periodic full traversal** (a map scan, an ESP sweep) touches every instance anyway — while a family is unresolved, record the addresses of its class instances as they pass (dedup by address, cap each pool at ~12–14).
+- **Per-avatar child iteration** reaches classes the map may not contain at all: characters carry SpecialMeshes (hats, R6 heads) and CharacterMeshes in every game.
+- When a pool grows, re-run **just that family's derivation** against it — dirty-gated (only on new samples) and tries-capped (~6 per family), so a family that genuinely can't pin stops costing anything.
+- On success, refresh whatever consumes the offsets immediately instead of waiting out the next periodic pass.
+
+Pools and their dedup sets are address-keyed — clear them on place change like every other address-keyed cache. Steady-state cost once everything resolves: one table lookup per traversed node. The performance stakes are real in both directions — a resolver that keeps failing keeps paying for full walks and window scans (thousands of sandbox calls compressed into single frames, every attempt, every place), where one that resolves quickly goes permanently quiet.
 
 ```lua
 local OFF = {}        -- filled by the resolver; nil = don't attempt that read
@@ -78,6 +92,8 @@ end
 | BasePart | Shape | `byte` | Enum.PartType `0..4` — see [part shapes](/docs/roblox/part-shapes). Only meaningful when ClassName is `Part`; WedgePart/CornerWedgePart are separate classes and their Shape byte is meaningless |
 | Decal | ColorMapContent | `string` | the texture content URL — same layout for `Texture` instances |
 | Decal | Face | `int` | Enum.NormalId `0..5` — see [surfaces & decals](/docs/roblox/surfaces-decals) |
+| Decal | Transparency | `float` | `0..1`, shared layout with `Texture` — accept only with a low-end witness (see scan disciplines) |
+| Texture | StudsPerTileU/V | `float` ×2 | adjacent floats, `Texture`-only — validate on Texture samples, never a pooled Decal+Texture sample |
 | SpecialMesh | Offset | `vector3` | DataModelMesh base — shared by SpecialMesh / CylinderMesh / BlockMesh; semantics on [classic meshes](/docs/roblox/classic-meshes) |
 | SpecialMesh | Scale | `vector3` | same; negative components are legitimate (mirror trick) |
 | SpecialMesh | MeshId | `string` | `""` when the mesh is not a FileMesh |
